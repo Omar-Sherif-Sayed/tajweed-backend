@@ -1,0 +1,17 @@
+# The local PostgreSQL for development. `./gradlew bootRun` starts it by itself (spring-boot-docker-compose) and
+# connects to it; Docker Desktop must be running. These credentials are for this local container only — production
+# reads its own from environment variables, never from this repository.
+services:
+  postgres:
+    image: 'postgres:18'
+    environment:
+      - 'POSTGRES_DB=tajweed'
+      - 'POSTGRES_USER=tajweed'
+      - 'POSTGRES_PASSWORD=tajweed_local_only'
+    ports:
+      - '5432'
+    volumes:
+      - 'tajweed-postgres:/var/lib/postgresql'
+
+volumes:
+  tajweed-postgres:

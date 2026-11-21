@@ -1,0 +1,103 @@
+openapi: 3.1.0
+info:
+  title: Tajweed - The Noble Quran and Its Sciences — public API
+  description: "Public, read-only API of «تجويد - القرآن الكريم وعلومه». No login,\
+    \ no accounts. Every answer is a BaseResponse; texts are in the language of the\
+    \ Accept-Language header (22 languages, Arabic by default)."
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit
+  version: "1"
+servers:
+- url: http://localhost
+  description: Generated server url
+tags:
+- name: App info
+  description: "The application's name, author, API version and languages."
+paths:
+  /v1/app-info:
+    get:
+      tags:
+      - App info
+      summary: "The application's name, author, API version and languages"
+      operationId: getAppInfo
+      parameters:
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoAppInfo"
+components:
+  schemas:
+    BaseResponseDtoAppInfo:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoAppInfo"
+    DtoAppInfo:
+      type: object
+      description: "The application's name, author, API version and languages."
+      properties:
+        name:
+          type: string
+        shortName:
+          type: string
+        author:
+          $ref: "#/components/schemas/DtoAuthor"
+        apiVersion:
+          type: string
+        language:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+    DtoAuthor:
+      type: object
+      description: The application's author and his one public link.
+      properties:
+        name:
+          type: string
+        link:
+          type: string

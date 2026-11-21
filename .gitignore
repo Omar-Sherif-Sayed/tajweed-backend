@@ -16,3 +16,6 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 /.claude/
+
+# Spring Initializr help file (not used)
+HELP.md

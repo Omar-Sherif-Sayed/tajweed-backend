@@ -1,0 +1,141 @@
+/*
+ * tajweed-backend — the public, read-only REST API of «تجويد - القرآن الكريم وعلومه».
+ *
+ * Versions: the libraries that Spring Boot manages carry no version here (the Spring Boot BOM chooses them, so they
+ * stay compatible); the others are pinned and were checked on Maven Central on 2026-11-21. Every choice and its reason
+ * is written in the documentation repository: docs/plan/backend-plan.md, and in this repository's AGENTS.md.
+ */
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.2.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
+    id 'checkstyle'
+}
+
+group = 'io.github.omarsherifsayed'
+version = '0.1.0'
+description = 'Tajweed - The Noble Quran and Its Sciences - public read-only REST API'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Versions of the libraries that Spring Boot does not manage (checked 2026-11-21).
+ext {
+    springdocVersion = '3.2.1'      // OpenAPI document and Swagger UI; 3.2.1 is built on Spring Boot 4.2.0
+    bucket4jVersion = '8.22.0'      // rate limiting
+    archunitVersion = '1.5.1'       // architecture rules checked by a test
+}
+
+dependencies {
+    // Web API: controllers, bean validation, JSON (Jackson 3), health endpoint
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Database: JPA (Hibernate), Flyway migrations, PostgreSQL
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-flyway'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Caching (Caffeine) and rate limiting (Bucket4j)
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation "com.bucket4j:bucket4j_jdk17-core:${bucket4jVersion}"
+
+    // OpenAPI: the contract the web, Android and iPhone clients read (docs/api/openapi.yaml)
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+
+    // Less boilerplate (constructors, getters) — the author's convention
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Local run only: starts the PostgreSQL of compose.yaml and connects to it
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+    // Tests: JUnit Jupiter, AssertJ, Mockito, MockMvc, Testcontainers, ArchUnit
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-flyway-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+    testImplementation 'org.testcontainers:testcontainers-postgresql'
+    testImplementation "com.tngtech.archunit:archunit-junit5:${archunitVersion}"
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// Mockito's inline mock maker is a Java agent. Loading it while the tests run is deprecated on JDK 21+ (and will be
+// blocked), so it is given to every test JVM up front with -javaagent, as Mockito's documentation advises.
+configurations {
+    mockitoAgent
+}
+dependencies {
+    mockitoAgent('org.mockito:mockito-core') {
+        transitive = false
+    }
+}
+tasks.withType(Test).configureEach {
+    jvmArgumentProviders.add({ ["-javaagent:${configurations.mockitoAgent.singleFile}"] } as CommandLineArgumentProvider)
+}
+
+// Unit tests: everything not tagged "integration" — no database, no Docker, no network.
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags 'integration'
+    }
+}
+
+// Integration tests: tagged "integration" — a real PostgreSQL 18 in Docker (Testcontainers). Docker must be running.
+tasks.register('integrationTest', Test) {
+    description = 'Runs the tests tagged "integration" (PostgreSQL in Docker through Testcontainers).'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+    shouldRunAfter tasks.named('test')
+}
+
+// Coverage: a report only, no minimum (the author's convention) — build/reports/jacoco/test/html/index.html
+tasks.named('jacocoTestReport') {
+    dependsOn tasks.named('test')
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+// Javadoc everywhere (the author, 2026-11-21: «javadoc on the code everywhere, to be readable in the future»):
+// Checkstyle runs only the Javadoc rules of config/checkstyle/checkstyle.xml and fails the build on a missing comment.
+checkstyle {
+    toolVersion = '14.4.0'
+    configFile = file('config/checkstyle/checkstyle.xml')
+    maxWarnings = 0
+    ignoreFailures = false
+}
+
+// The Javadoc tool itself must accept every comment (broken links, bad tags fail the build).
+tasks.named('javadoc') {
+    options.encoding = 'UTF-8'
+    options.addBooleanOption('Xdoclint:all,-missing', true)
+    options.addBooleanOption('Werror', true)
+}
+tasks.named('check') {
+    dependsOn tasks.named('javadoc')
+}
+tasks.named('checkstyleTest') {
+    configFile = file('config/checkstyle/checkstyle-test.xml')
+}

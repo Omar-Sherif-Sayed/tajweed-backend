@@ -1,6 +1,5 @@
-# Text files are stored with LF line endings on every machine.
-* text=auto eol=lf
+# Line endings: the shell script stays LF, the Windows script CRLF; the wrapper jar is binary.
+/gradlew text eol=lf
 *.bat text eol=crlf
-*.png binary
-*.jpg binary
 *.jar binary
+* text=auto

@@ -1,0 +1,53 @@
+# CI of tajweed-backend: on every push and pull request to main —
+#   1. build, unit tests, Javadoc checks (Checkstyle + the Javadoc tool), JaCoCo report   (./gradlew build)
+#   2. integration tests on a real PostgreSQL 18 in Docker (Testcontainers)               (./gradlew integrationTest)
+#   3. the OpenAPI contract: the integration test rewrites docs/api/openapi.yaml; the job fails when the committed file
+#      differs, so the three clients always read the contract of the code that is in main.
+# No secret is used: nothing here calls Dorar or the Quran Foundation.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Action versions: the latest major tags, read on 2026-11-21.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Java 25 (Temurin)
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Gradle (wrapper, cache)
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Build, unit tests, Javadoc checks
+        run: ./gradlew build jacocoTestReport --console=plain
+
+      - name: Integration tests (PostgreSQL 18 in Docker)
+        run: ./gradlew integrationTest --console=plain
+
+      - name: The OpenAPI contract is up to date
+        run: git diff --exit-code -- docs/api/openapi.yaml
+
+      - name: Test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports
+          path: |
+            build/reports/tests/
+            build/reports/jacoco/
+            build/reports/checkstyle/
+          retention-days: 14

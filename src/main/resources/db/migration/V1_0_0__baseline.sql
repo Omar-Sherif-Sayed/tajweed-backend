@@ -1,0 +1,11 @@
+-- V1_0_0 — baseline (task P0-07, 2026-11-21).
+--
+-- The first migration: it creates nothing, so that the database has a Flyway history from day one and every later
+-- change is a numbered, reviewed migration (AGENTS.md §5, §9). Rules for every migration:
+--   * name: V<MAJOR>_<MINOR>_<PATCH>__<what>.sql; an applied migration is never edited — a new one corrects it;
+--   * every table has pk_id and the audit columns created_at / updated_at (AbstractAuditingEntity);
+--   * every constraint is named (pk_<table>, fk_<table>_<column>, uk_<table>_<columns>, ck_<table>_<rule>);
+--   * the exact tables and columns of a new module are listed for the author's approval before the migration is
+--     written (AGENTS.md §1).
+-- Phase 1 adds the quran module's tables here (P1-B1).
+SELECT 1;
