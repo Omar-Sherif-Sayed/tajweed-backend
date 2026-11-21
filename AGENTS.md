@@ -145,4 +145,6 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 - `./gradlew bootRun`: Docker Compose started PostgreSQL 18, Flyway applied `1.0.0 - baseline`; `GET /v1/app-info`
   answered in Urdu; an unknown path answered `404 NOT_FOUND_PATH` in French; a repeated request with `If-None-Match`
   answered `304`.
-- ☐ CI on GitHub: runs on the first push.
+- CI on GitHub: run #2 green (1 min 41 s — build, unit and integration tests, OpenAPI contract unchanged). Run #1
+  failed with exit code 126: `gradlew` had been committed from Windows without the execute bit — fixed with
+  `git update-index --chmod=+x gradlew`.
