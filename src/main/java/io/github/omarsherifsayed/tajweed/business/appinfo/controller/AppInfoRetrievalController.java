@@ -2,14 +2,13 @@ package io.github.omarsherifsayed.tajweed.business.appinfo.controller;
 
 import io.github.omarsherifsayed.tajweed.business.appinfo.schema.response.DtoAppInfo;
 import io.github.omarsherifsayed.tajweed.business.appinfo.service.AppInfoRetrievalService;
+import io.github.omarsherifsayed.tajweed.general.config.HttpCaching;
 import io.github.omarsherifsayed.tajweed.general.i18n.MessageService;
 import io.github.omarsherifsayed.tajweed.general.schema.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.time.Duration;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AppInfoRetrievalController {
 
-    /** How long clients and caches may keep the answer: it changes only with a release. */
-    private static final Duration MAX_AGE = Duration.ofHours(1);
-
     /** Builds the answer. */
     private final AppInfoRetrievalService appInfoRetrievalService;
 
@@ -49,7 +45,7 @@ public class AppInfoRetrievalController {
     public ResponseEntity<BaseResponse<DtoAppInfo>> getAppInfo(Locale locale) {
         DtoAppInfo info = appInfoRetrievalService.getAppInfo(locale);
         return ResponseEntity.ok()
-                .cacheControl(CacheControl.maxAge(MAX_AGE).cachePublic())
+                .cacheControl(HttpCaching.APP_INFO)
                 .varyBy(HttpHeaders.ACCEPT_LANGUAGE)
                 .body(BaseResponse.ok(messages.get(locale, "response.success"), info));
     }

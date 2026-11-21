@@ -1,0 +1,12 @@
+# Reviewed corrections to the hizb-quarter starts of Tanzil Quran Metadata 1.0 (quran-data.xml).
+#
+# The applications follow the printed Madinah mushaf (1405H layout). Where Tanzil's metadata places a quarter start
+# elsewhere than the printed copy, the start is moved here, with its evidence. Nothing else in the metadata is changed,
+# and the Quran text itself is never touched (AGENTS.md §6.1). Each row was checked against the DigitalKhatt
+# old-Madinah layout, the King Fahd Complex glyph data and the author's printed copy (tajweed-docs:
+# docs/design/prototypes/assets/README.md, "What was verified", 2026-11-17). The import refuses a row whose Tanzil
+# position does not match the metadata.
+#
+# Columns: quarter number (1-240), Tanzil's start (surah, ayah), the printed mushaf's start (surah, ayah), evidence.
+quarter,tanzil_surah,tanzil_ayah,mushaf_surah,mushaf_ayah,evidence
+106,15,50,15,49,DigitalKhatt layout and King Fahd glyph data place the quarter sign before 15:49; the author's printed copy (pages 263-264; photographed 2026-11-17) agrees

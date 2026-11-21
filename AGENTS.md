@@ -1,8 +1,10 @@
 # AGENTS.md — tajweed-backend
 
-> **State (2026-11-21): scaffolded (task `P0-07`).** Spring Boot 4.2.0 on Java 25, PostgreSQL 18, one endpoint
-> (`GET /v1/app-info`) in 22 languages, the shared layer (`general/`), 42 tests green (39 unit, 3 integration), CI.
-> Next: phase 1 — the `quran` module (`P1-B1 …`); its tables are listed for the author's approval first.
+> **State (2026-11-21): phase 1 started.** Scaffold (`P0-07`) + the **`quran` module**: the Tanzil Uthmani text and
+> metadata imported byte for byte after checksum and count checks (6,236 ayahs, 604 pages, 30 juz, 240 quarters with
+> the reviewed 15:49 correction), served by `/v1/surahs`, `/v1/pages/{page}`, `/v1/juzs`; the `source` module with
+> `GET /v1/content-version`. 57 tests green (every ayah compared with the file). Next: the search text (⏸ the
+> author's permission to download Tanzil's Simple texts), the `reciter` module, the API contract for phase 1.
 
 ## Read first
 
@@ -63,7 +65,8 @@ config/checkstyle/           checkstyle.xml (main: Javadoc everywhere) · checks
 compose.yaml                 local PostgreSQL 18 — started by bootRun itself
 Dockerfile                   build on JDK 25, run on JRE 25 as a non-root user
 .github/workflows/ci.yml     build + unit tests + Javadoc checks · integration tests · OpenAPI contract check
-docs/                        README.md (index) · api/openapi.yaml (generated contract — never edited by hand)
+docs/                        README.md (index) · api/openapi.yaml (generated) · database/ (every table and column)
+                             · data-sources/ (every content file: origin, licence, SHA-256)
 src/main/java/io/github/omarsherifsayed/tajweed/
   TajweedApplication.java
   general/                   shared by every module; never depends on business/
@@ -74,10 +77,16 @@ src/main/java/io/github/omarsherifsayed/tajweed/
     schema/                  BaseResponse<T>
     audit/                   AbstractAuditingEntity (created_at, updated_at)
   business/
-    appinfo/                 controller · service (+ impl) · schema/response (Dto*) · mapper
+    appinfo/                 GET /v1/app-info — controller · service (+ impl) · schema/response (Dto*) · mapper
+    source/                  content_source: GET /v1/content-version (entity, repository, service, mapper)
+    quran/                   surah, ayah: GET /v1/surahs, /v1/surahs/{n}/ayahs, /v1/surahs/{n}/ayahs/{a},
+                             /v1/pages/{page}, /v1/juzs (entity, enums, repository + projections, services, mapper)
+src/main/java/db/migration/  Java migrations that import content: V1_1_1__ImportQuranText (checksums, counts, insert)
 src/main/resources/
   application.properties     every setting, with its environment variable
-  db/migration/              V1_0_0__baseline.sql — then V<MAJOR>_<MINOR>_<PATCH>__<what>.sql
+  db/migration/              V1_0_0__baseline.sql, V1_1_0__create_content_source_and_quran_tables.sql …
+  content/                   source files, byte for byte (-text in .gitattributes): tanzil/quran-uthmani.txt,
+                             tanzil/quran-data.xml, reviewed/hizb-quarter-corrections.csv — docs/data-sources/README.md
   i18n/                      messages.properties (Arabic, default) + messages_<code>.properties × 21
 src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegrationTest (tag integration)
 ```
@@ -104,6 +113,11 @@ src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegr
 - **Database**: the schema only through Flyway; `spring.jpa.hibernate.ddl-auto=validate`; an applied migration is never
   edited; every table has `pk_id` and the audit columns; every constraint is named. Content of Quran Foundation and
   Dorar is **never** committed or stored beyond their terms (parent §5, §7.1, §8.14).
+- **Content import**: a Flyway **Java** migration in `db.migration` reads the files of `src/main/resources/content/`,
+  verifies each SHA-256 against a constant, checks every count, and only then inserts — the text as written, never
+  edited (see `V1_1_1__ImportQuranText`). Content entities are `@Immutable`; the code never writes them. A reviewed
+  correction is a data file with its evidence (`content/reviewed/`), never a hidden `if` in code.
+- **Every Quran answer carries `textSource`** (Tanzil's name and link — its licence requires them to be shown).
 - **Logs**: identifiers and timings, never request bodies, secrets or IP addresses.
 - **Tests**: given / when / then; class Javadoc + `@DisplayName`; unit tests need no database or network; integration
   tests are tagged `integration` and use `TestcontainersConfiguration` (PostgreSQL 18).
@@ -140,7 +154,10 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 
 ## Verified on 2026-11-21
 
-- `./gradlew build jacocoTestReport integrationTest`: 42 tests, 0 failures (39 unit, 3 integration on PostgreSQL 18).
+- `./gradlew build jacocoTestReport integrationTest`: 57 tests, 0 failures — among them every one of the 6,236 stored
+  ayahs compared with the Tanzil file, the 15:49 quarter, 112 basmalas (95:1 and 97:1 with their shadda), 15 sajdahs.
+- `bootRun` on the development database: migrations 1.1.0 and 1.1.1 applied; `GET /v1/surahs/112/ayahs` equal to the
+  file, UTF-8.
 - A class without Javadoc fails Checkstyle (tried with a probe class, then removed).
 - `./gradlew bootRun`: Docker Compose started PostgreSQL 18, Flyway applied `1.0.0 - baseline`; `GET /v1/app-info`
   answered in Urdu; an unknown path answered `404 NOT_FOUND_PATH` in French; a repeated request with `If-None-Match`

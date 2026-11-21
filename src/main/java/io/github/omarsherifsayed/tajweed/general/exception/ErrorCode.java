@@ -16,6 +16,9 @@ public enum ErrorCode {
     /** The path does not exist (no endpoint answers it). */
     NOT_FOUND_PATH(HttpStatus.NOT_FOUND, "error.not_found_path"),
 
+    /** The surah exists, but has no ayah with this number (for example 1:8 — Al-Fatihah has 7 ayahs). */
+    NOT_FOUND_AYAH(HttpStatus.NOT_FOUND, "error.not_found_ayah"),
+
     /** The request is malformed: a missing or invalid parameter, a body that cannot be read. */
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "error.invalid_request"),
 

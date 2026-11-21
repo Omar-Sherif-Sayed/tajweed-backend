@@ -12,9 +12,318 @@ servers:
 - url: http://localhost
   description: Generated server url
 tags:
+- name: Quran
+  description: "Surahs, ayahs, pages and juz of the Madinah mushaf — text verbatim\
+    \ from Tanzil."
 - name: App info
   description: "The application's name, author, API version and languages."
+- name: Content
+  description: The content's version and its sources.
 paths:
+  /v1/surahs:
+    get:
+      tags:
+      - Quran
+      summary: "The 114 surahs: names, Makki / Madani, order of revelation, ayahs,\
+        \ first page"
+      operationId: getSurahs
+      parameters:
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseListDtoSurah"
+  /v1/surahs/{surahNumber}/ayahs:
+    get:
+      tags:
+      - Quran
+      summary: A surah with all its ayahs (verbatim Tanzil text) and the source of
+        the text
+      operationId: getSurahAyahs
+      parameters:
+      - name: surahNumber
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+          maximum: 114
+          minimum: 1
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoSurahAyahs"
+  /v1/surahs/{surahNumber}/ayahs/{ayahNumber}:
+    get:
+      tags:
+      - Quran
+      summary: "One ayah (verbatim Tanzil text) with its page, juz, hizb, quarter\
+        \ and sajdah"
+      operationId: getAyah
+      parameters:
+      - name: surahNumber
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+          maximum: 114
+          minimum: 1
+      - name: ayahNumber
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoAyah"
+  /v1/pages/{page}:
+    get:
+      tags:
+      - Quran
+      summary: The ayahs that start on a page of the Madinah mushaf (1 – 604)
+      operationId: getPage
+      parameters:
+      - name: page
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+          maximum: 604
+          minimum: 1
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoPage"
+  /v1/juzs:
+    get:
+      tags:
+      - Quran
+      summary: "The 30 juz: the first ayah and page of each"
+      operationId: getJuzs
+      parameters:
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseListDtoJuz"
+  /v1/content-version:
+    get:
+      tags:
+      - Content
+      summary: The content's version (a fingerprint of its sources) and the sources
+      operationId: getContentVersion
+      parameters:
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoContentVersion"
   /v1/app-info:
     get:
       tags:
@@ -62,6 +371,222 @@ paths:
                 $ref: "#/components/schemas/BaseResponseDtoAppInfo"
 components:
   schemas:
+    BaseResponseListDtoSurah:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoSurah"
+    DtoSurah:
+      type: object
+      description: "A surah: number, names, Makki / Madani, order of revelation, ayahs,\
+        \ first page."
+      properties:
+        number:
+          type: integer
+          format: int32
+        nameAr:
+          type: string
+        nameTransliteration:
+          type: string
+        nameEn:
+          type: string
+        revelationType:
+          type: string
+          enum:
+          - MECCAN
+          - MEDINAN
+        revelationOrder:
+          type: integer
+          format: int32
+        ayahCount:
+          type: integer
+          format: int32
+        startPage:
+          type: integer
+          format: int32
+    BaseResponseDtoSurahAyahs:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoSurahAyahs"
+    DtoAyah:
+      type: object
+      description: "An ayah: verbatim Tanzil text and its page, juz, hizb, quarter\
+        \ and sajdah."
+      properties:
+        id:
+          type: integer
+          format: int32
+        surahNumber:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        text:
+          type: string
+        basmalaWordCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+        juz:
+          type: integer
+          format: int32
+        hizb:
+          type: integer
+          format: int32
+        hizbQuarter:
+          type: integer
+          format: int32
+        sajdah:
+          type: string
+          enum:
+          - RECOMMENDED
+          - OBLIGATORY
+    DtoContentSource:
+      type: object
+      description: "A source of the content: name, licence, link and checksum."
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        licence:
+          type: string
+        sourceUrl:
+          type: string
+        sha256:
+          type: string
+        obtainedOn:
+          type: string
+          format: date
+    DtoSurahAyahs:
+      type: object
+      description: "A surah, its ayahs in order, and the source of the text."
+      properties:
+        surah:
+          $ref: "#/components/schemas/DtoSurah"
+        ayahs:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoAyah"
+        textSource:
+          $ref: "#/components/schemas/DtoContentSource"
+    BaseResponseDtoAyah:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoAyah"
+    BaseResponseDtoPage:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoPage"
+    DtoPage:
+      type: object
+      description: "The ayahs that start on a page of the Madinah mushaf, and the\
+        \ source of the text."
+      properties:
+        page:
+          type: integer
+          format: int32
+        ayahs:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoAyah"
+        textSource:
+          $ref: "#/components/schemas/DtoContentSource"
+    BaseResponseListDtoJuz:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoJuz"
+    DtoJuz:
+      type: object
+      description: "Where a juz starts: its first ayah and page."
+      properties:
+        number:
+          type: integer
+          format: int32
+        startSurahNumber:
+          type: integer
+          format: int32
+        startAyahNumber:
+          type: integer
+          format: int32
+        startPage:
+          type: integer
+          format: int32
+    BaseResponseDtoContentVersion:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoContentVersion"
+    DtoContentVersion:
+      type: object
+      description: The content's version (a fingerprint of its sources) and the sources
+        themselves.
+      properties:
+        version:
+          type: string
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoContentSource"
     BaseResponseDtoAppInfo:
       type: object
       description: "The envelope of every answer: success flag, code, message in the\

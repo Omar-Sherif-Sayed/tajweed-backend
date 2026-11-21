@@ -1,5 +1,8 @@
 # Line endings: the shell script stays LF, the Windows script CRLF; the wrapper jar is binary.
+* text=auto
 /gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary
-* text=auto
+# The content source files are copied byte for byte and verified by SHA-256 (AGENTS.md §6.1, §6.2):
+# Git must never change their bytes or line endings.
+src/main/resources/content/** -text

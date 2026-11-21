@@ -12,6 +12,12 @@ The whole product — its rules, decisions, design and plan — is described in 
 | Endpoint | What it returns |
 | --- | --- |
 | `GET /v1/app-info` | the application's name, author, API version and the 22 languages, in the language of `Accept-Language` |
+| `GET /v1/surahs` | the 114 surahs: Arabic and transliterated names, Makki / Madani, order of revelation, ayahs, first page |
+| `GET /v1/surahs/{surah}/ayahs` | a surah and all its ayahs — the text exactly as Tanzil writes it — and the text's source |
+| `GET /v1/surahs/{surah}/ayahs/{ayah}` | one ayah with its page, juz, hizb, quarter and sajdah |
+| `GET /v1/pages/{page}` | the ayahs that start on a page of the Madinah mushaf (1 – 604) |
+| `GET /v1/juzs` | where each of the 30 juz starts |
+| `GET /v1/content-version` | a fingerprint of the content's sources — the apps refresh their copies when it changes |
 | `GET /actuator/health` | `UP` when the application and its database are working |
 | `GET /swagger-ui.html` · `GET /v3/api-docs` | the API's documentation and its OpenAPI contract |
 
@@ -24,6 +30,13 @@ Every answer is wrapped in the same envelope:
 An error has `"success": false`, an error `code` (for example `NOT_FOUND_PATH`) and a `message` in the requested
 language. The language comes from the `Accept-Language` header — `ar` (the default), `en`, `ru`, `es`, `de`, `it`,
 `fr`, `ur`, `hi`, `ko`, `id`, `ja`, `zh`, `tr`, `bn`, `fa`, `ms`, `sw`, `ha`, `pt`, `ps`, `uz`.
+
+## The Quran text
+
+The text is the **Tanzil Quran Text (Uthmani, 1.1)** — <https://tanzil.net> — under Creative Commons Attribution 3.0:
+it is copied verbatim and never changed. The file is checked by its SHA-256 before it is imported, and a test compares
+every stored ayah with it. Page, juz and quarter positions come from Tanzil's metadata (the quarter at 15:49 follows
+the printed Madinah mushaf). Details: `docs/data-sources/README.md` and `docs/database/README.md`.
 
 ## Built with
 
