@@ -1,0 +1,13 @@
+# Reference counts of GET /v1/quran-search, computed by an independent implementation of the search rules
+# (Python, 2026-11-21) on the Tanzil Simple / Simple (Clean) texts. A test checks the Java service gives the same.
+query,ayahs,first_surah,first_ayah
+الصبر,4,2,45
+الرحمن,159,1,1
+يا أيها الذين آمنوا,89,2,104
+قل هو الله أحد,1,112,1
+مُحَمَّدٌ,2,3,144
+سبح اسم ربك الأعلى,1,87,1
+الله,1842,1,1
+جنات,67,2,25
+هدى,191,2,2
+إبراهيم,63,2,124

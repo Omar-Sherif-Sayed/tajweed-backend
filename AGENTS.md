@@ -3,8 +3,9 @@
 > **State (2026-11-21): phase 1 started.** Scaffold (`P0-07`) + the **`quran` module**: the Tanzil Uthmani text and
 > metadata imported byte for byte after checksum and count checks (6,236 ayahs, 604 pages, 30 juz, 240 quarters with
 > the reviewed 15:49 correction), served by `/v1/surahs`, `/v1/pages/{page}`, `/v1/juzs`; the `source` module with
-> `GET /v1/content-version`. 57 tests green (every ayah compared with the file). Next: the search text (⏸ the
-> author's permission to download Tanzil's Simple texts), the `reciter` module, the API contract for phase 1.
+> `GET /v1/content-version`; **Quran search** (F16): Tanzil «Simple» and «Simple (Clean)» imported verbatim as the
+> search text, `GET /v1/quran-search`. 75 tests green (every ayah and every search-text row compared with its file;
+> ten reference queries). Next: the `reciter` module, the API contract for phase 1.
 
 ## Read first
 
@@ -81,12 +82,16 @@ src/main/java/io/github/omarsherifsayed/tajweed/
     source/                  content_source: GET /v1/content-version (entity, repository, service, mapper)
     quran/                   surah, ayah: GET /v1/surahs, /v1/surahs/{n}/ayahs, /v1/surahs/{n}/ayahs/{a},
                              /v1/pages/{page}, /v1/juzs (entity, enums, repository + projections, services, mapper)
-src/main/java/db/migration/  Java migrations that import content: V1_1_1__ImportQuranText (checksums, counts, insert)
+                             · GET /v1/quran-search — search/: ArabicSearchNormalizer (the one tidying function),
+                             QuranSearchIndex (in memory, built on the first search), SurahNameMatcher (names, references)
+src/main/java/db/migration/  Java migrations that import content: V1_1_1__ImportQuranText (checksums, counts, insert),
+                             V1_2_1__ImportQuranSearchText (the search text, same checks)
 src/main/resources/
   application.properties     every setting, with its environment variable
   db/migration/              V1_0_0__baseline.sql, V1_1_0__create_content_source_and_quran_tables.sql …
   content/                   source files, byte for byte (-text in .gitattributes): tanzil/quran-uthmani.txt,
-                             tanzil/quran-data.xml, reviewed/hizb-quarter-corrections.csv — docs/data-sources/README.md
+                             tanzil/quran-data.xml, tanzil/quran-simple.txt, tanzil/quran-simple-clean.txt,
+                             reviewed/hizb-quarter-corrections.csv — docs/data-sources/README.md
   i18n/                      messages.properties (Arabic, default) + messages_<code>.properties × 21
 src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegrationTest (tag integration)
 ```
@@ -117,6 +122,12 @@ src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegr
   verifies each SHA-256 against a constant, checks every count, and only then inserts — the text as written, never
   edited (see `V1_1_1__ImportQuranText`). Content entities are `@Immutable`; the code never writes them. A reviewed
   correction is a data file with its evidence (`content/reviewed/`), never a hidden `if` in code.
+- **Search** (parent `AGENTS.md` §8.1): the displayed text is never tidied or searched; only the search text is,
+  through `ArabicSearchNormalizer` alone — NFC; tatweel and the annotation signs U+06D6 – U+06ED removed;
+  أ إ آ ٱ → ا; ى → ي; ة → ه; without tashkeel every mark removed, with tashkeel kept; spaces collapsed. A match is the
+  tidied query inside the tidied ayah. `src/test/resources/search/reference-queries.csv` holds ten queries with
+  their counts, computed by an independent implementation; the clients will run the same list. Changing a rule
+  means changing that file too, with the reason.
 - **Every Quran answer carries `textSource`** (Tanzil's name and link — its licence requires them to be shown).
 - **Logs**: identifiers and timings, never request bodies, secrets or IP addresses.
 - **Tests**: given / when / then; class Javadoc + `@DisplayName`; unit tests need no database or network; integration
@@ -154,6 +165,10 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 
 ## Verified on 2026-11-21
 
+- `./gradlew build jacocoTestReport integrationTest`: 75 tests, 0 failures — with the search: both search texts
+  stored verbatim beside the right ayah (6,236 rows each), the ten reference queries (e.g. «الصبر» 4 ayahs from
+  2:45, «الله» 1,842, «مُحَمَّدٌ» with tashkeel 2 from 3:144), «2:255» → ayah 262, «البقرة» → surah 2, the word
+  positions for highlighting (112:1) and none guessed where the spellings split words differently (2:104).
 - `./gradlew build jacocoTestReport integrationTest`: 57 tests, 0 failures — among them every one of the 6,236 stored
   ayahs compared with the Tanzil file, the 15:49 quarter, 112 basmalas (95:1 and 97:1 with their shadda), 15 sajdahs.
 - `bootRun` on the development database: migrations 1.1.0 and 1.1.1 applied; `GET /v1/surahs/112/ayahs` equal to the

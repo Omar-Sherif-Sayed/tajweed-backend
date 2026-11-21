@@ -17,6 +17,8 @@ a simple edit of these migrations.
 | 1.0.0 | `V1_0_0__baseline.sql` | the Flyway history starts (creates nothing) |
 | 1.1.0 | `V1_1_0__create_content_source_and_quran_tables.sql` | the three tables below |
 | 1.1.1 | `db/migration/V1_1_1__ImportQuranText.java` | imports the Quran text and metadata after verifying every file's SHA-256 and every count |
+| 1.2.0 | `V1_2_0__create_ayah_search_text_table.sql` | the table `ayah_search_text` |
+| 1.2.1 | `db/migration/V1_2_1__ImportQuranSearchText.java` | imports Tanzil «Simple» and «Simple (Clean)» after verifying both SHA-256 and that both have the 6,236 ayahs in the order of `ayah`; records the two files in `content_source` |
 
 ## `content_source` — every file the content comes from (module `source`)
 
@@ -65,9 +67,21 @@ their copies when it changes) and, later, the Sources section (F17).
 
 Indexes: `ix_ayah_page`, `ix_ayah_juz`, `ix_ayah_hizb_quarter` (reading by page, juz and quarter).
 
+## `ayah_search_text` — the search text (module `quran`, F16, since 1.2.0)
+
+The same ayah in everyday spelling, used **only to search** — never displayed (`AGENTS.md` §8.1). Stored verbatim;
+the search tidies it in memory (`ArabicSearchNormalizer`), never in the table.
+
+| Column | Type | Value and source |
+| --- | --- | --- |
+| `ayah_id` | integer | the ayah (`pk_ayah_search_text`, `fk_ayah_search_text_ayah` → `ayah.pk_id`) |
+| `text_simple` | text | Tanzil «Simple» (with tashkeel), byte for byte |
+| `text_simple_clean` | text | Tanzil «Simple (Clean)» (without tashkeel), byte for byte |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+No index in the database: the search reads the 6,236 rows once and keeps a tidied copy in memory (about 2 MB).
+
 ## Planned (not created yet)
 
-- The **search text** (F16, `AGENTS.md` §8.1): Tanzil "Simple" and "Simple (Clean)", one row per ayah beside
-  `ayah`, never shown. ⏸ The two files are downloaded only with the author's permission.
 - The **reciter** module (F3, F4, F11): reciters, recitations (style, riwayah, completeness), audio sources and ayah
   timings — from mp3quran.net (rights clause read 2026-11-20) and `AGENTS.md` §7.3.

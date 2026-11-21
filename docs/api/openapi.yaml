@@ -181,6 +181,88 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BaseResponseDtoAyah"
+  /v1/quran-search:
+    get:
+      tags:
+      - Quran
+      summary: "Search the Quran: words with or without tashkeel, a surah name, or\
+        \ an ayah reference"
+      operationId: search
+      parameters:
+      - name: q
+        in: query
+        description: "Words, a surah name, or a reference such as 2:255"
+        required: true
+        schema:
+          type: string
+          maxLength: 100
+          minLength: 0
+      - name: surah
+        in: query
+        description: The surah open in the reader (a number alone then names one of
+          its ayahs)
+        required: false
+        schema:
+          type: integer
+          format: int32
+          maximum: 114
+          minimum: 1
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          maximum: 6236
+          minimum: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          maximum: 100
+          minimum: 1
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoQuranSearch"
   /v1/pages/{page}:
     get:
       tags:
@@ -505,6 +587,79 @@ components:
           type: string
         data:
           $ref: "#/components/schemas/DtoAyah"
+    BaseResponseDtoQuranSearch:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoQuranSearch"
+    DtoQuranSearch:
+      type: object
+      description: "A Quran search: the ayah a reference names, the surahs a name\
+        \ names, and the ayahs with the words."
+      properties:
+        query:
+          type: string
+        withTashkeel:
+          type: boolean
+        ayah:
+          $ref: "#/components/schemas/DtoAyah"
+        surahs:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoSurah"
+        total:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        hits:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoSearchHit"
+        countsBySurah:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoSurahCount"
+        textSource:
+          $ref: "#/components/schemas/DtoContentSource"
+        searchSources:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoContentSource"
+    DtoSearchHit:
+      type: object
+      description: "An ayah that contains the searched words, and which of its words\
+        \ to highlight."
+      properties:
+        ayah:
+          $ref: "#/components/schemas/DtoAyah"
+        matchedWords:
+          type: array
+          items:
+            type: integer
+            format: int32
+    DtoSurahCount:
+      type: object
+      description: How many found ayahs are in one surah.
+      properties:
+        surahNumber:
+          type: integer
+          format: int32
+        count:
+          type: integer
+          format: int32
     BaseResponseDtoPage:
       type: object
       description: "The envelope of every answer: success flag, code, message in the\

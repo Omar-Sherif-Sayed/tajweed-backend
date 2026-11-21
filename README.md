@@ -17,6 +17,7 @@ The whole product — its rules, decisions, design and plan — is described in 
 | `GET /v1/surahs/{surah}/ayahs/{ayah}` | one ayah with its page, juz, hizb, quarter and sajdah |
 | `GET /v1/pages/{page}` | the ayahs that start on a page of the Madinah mushaf (1 – 604) |
 | `GET /v1/juzs` | where each of the 30 juz starts |
+| `GET /v1/quran-search?q=…` | one search box: words with or without tashkeel (the ayahs that contain them, with the words to highlight, page by page), a surah name (Arabic or Latin), or a reference (`2:255`, «البقرة 255») |
 | `GET /v1/content-version` | a fingerprint of the content's sources — the apps refresh their copies when it changes |
 | `GET /actuator/health` | `UP` when the application and its database are working |
 | `GET /swagger-ui.html` · `GET /v3/api-docs` | the API's documentation and its OpenAPI contract |
