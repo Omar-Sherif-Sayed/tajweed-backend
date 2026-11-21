@@ -76,7 +76,8 @@ class QuranImportIntegrationTest {
         assertThat(count("select count(distinct hizb_quarter) from ayah")).isEqualTo(240);
         assertThat(count("select count(*) from ayah where basmala_word_count = 4")).isEqualTo(112);
         assertThat(count("select count(*) from ayah where sajdah_type is not null")).isEqualTo(15);
-        assertThat(count("select count(*) from content_source")).isEqualTo(5);
+        assertThat(count("select count(*) from content_source where code like 'TANZIL%' or code = 'QUARTER_CORRECTIONS'"))
+                .isEqualTo(5);
     }
 
     @Test
@@ -156,12 +157,12 @@ class QuranImportIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /v1/content-version gives a 16-digit fingerprint and the five sources")
+    @DisplayName("GET /v1/content-version gives a 16-digit fingerprint and every source (15)")
     void servesTheContentVersion() throws Exception {
         mockMvc.perform(get("/v1/content-version"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.version").value(org.hamcrest.Matchers.matchesPattern("[0-9a-f]{16}")))
-                .andExpect(jsonPath("$.data.sources.length()").value(5))
+                .andExpect(jsonPath("$.data.sources.length()").value(15))
                 .andExpect(jsonPath("$.data.sources[4].sha256")
                         .value("1862ee63c70fbfc6285e0bb0b9587b89beb5b7891109a4d543d9d2cf8283e8c8"))
                 .andExpect(jsonPath("$.data.sources[0].sha256")

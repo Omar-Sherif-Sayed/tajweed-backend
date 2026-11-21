@@ -17,6 +17,9 @@ public final class HttpCaching {
     /** Facts about the application: they change only with a release — an hour. */
     public static final CacheControl APP_INFO = CacheControl.maxAge(Duration.ofHours(1)).cachePublic();
 
+    /** Content with run-time state (a recitation with its sources' daily health check) — an hour. */
+    public static final CacheControl CHECKED_DAILY = CacheControl.maxAge(Duration.ofHours(1)).cachePublic();
+
     /**
      * Not instantiated: this class only holds constants.
      */

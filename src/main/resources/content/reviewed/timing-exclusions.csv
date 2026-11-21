@@ -1,0 +1,12 @@
+# mp3quran ayah timings left out of the import, each with what is wrong (checked 2026-11-22 against the Tanzil
+# ayah count). surah * = the whole recitation (it fails in most surahs). The import refuses a failing surah that
+# is not listed here, a listed surah that passes, and a whole recitation listed that does not fail in most surahs.
+read,surah,reason
+31,9,128 ayah rows for 129 ayahs (ayah 129 missing)
+31,12,116 ayah rows for 111 ayahs (ayah 112 113 114 115 116 extra)
+31,65,11 ayah rows for 12 ayahs (ayah 12 missing)
+31,91,16 ayah rows for 15 ayahs (ayah 16 extra)
+51,9,128 ayah rows for 129 ayahs (ayah 129 missing)
+74,*,112 of 114 surahs fail (e.g. surah 1: 5 ayah rows for 7 ayahs (ayah 6 7 missing)) - the numbering cannot be trusted in any surah
+112,9,128 ayah rows for 129 ayahs (ayah 129 missing)
+118,1,6 ayah rows for 7 ayahs (ayah 7 missing)

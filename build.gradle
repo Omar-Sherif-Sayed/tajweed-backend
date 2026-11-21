@@ -32,6 +32,7 @@ ext {
     springdocVersion = '3.2.1'      // OpenAPI document and Swagger UI; 3.2.1 is built on Spring Boot 4.2.0
     bucket4jVersion = '8.22.0'      // rate limiting
     archunitVersion = '1.5.1'       // architecture rules checked by a test
+    shedlockVersion = '7.11.0'      // one instance runs a scheduled job (checked on Maven Central 2026-11-22)
 }
 
 dependencies {
@@ -50,6 +51,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
     implementation "com.bucket4j:bucket4j_jdk17-core:${bucket4jVersion}"
+
+    // Schedulers that run once even with two instances (the daily health check of the audio sources)
+    implementation "net.javacrumbs.shedlock:shedlock-spring:${shedlockVersion}"
+    implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:${shedlockVersion}"
 
     // OpenAPI: the contract the web, Android and iPhone clients read (docs/api/openapi.yaml)
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"

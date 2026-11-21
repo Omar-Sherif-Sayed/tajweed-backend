@@ -1,0 +1,41 @@
+# The recitations chosen with the author on 2026-11-22 (documentation repository, docs/plan/backend-plan.md §13),
+# in the order shown. provider MP3QURAN: key = mp3quran moshaf id; EVERYAYAH: key = its folders, best first.
+# everyayah_failover: EveryAyah folders of the same recording, tried after the mp3quran file (see evidence).
+id,reciter_mp3quran_id,provider,key,riwayah_id,style,name_ar,name_en,everyayah_failover,evidence
+1,112,MP3QURAN,112,1,MURATTAL,,,Minshawy_Murattal_128kbps,requested (AGENTS.md 7.3); EveryAyah Minshawy_Murattal_128kbps is the same recording: 99% of 112 sampled ayahs within 5% of mp3quran's timings (2026-11-22)
+2,112,MP3QURAN,113,1,MUJAWWAD,,,,requested (AGENTS.md 7.3)
+3,112,MP3QURAN,114,1,MUALLIM,,,,requested (AGENTS.md 7.3)
+4,112,MP3QURAN,10924,1,,,,,the 1967 recording - 110 surahs - included by the author 2026-11-22
+5,118,MP3QURAN,118,1,MURATTAL,,,Husary_128kbps;Husary_64kbps,requested (AGENTS.md 7.3); EveryAyah Husary_128kbps and _64kbps are the same recording: 100% and 98% of 113 sampled ayahs within 5% (2026-11-22)
+6,118,MP3QURAN,119,1,MUJAWWAD,,,,requested (AGENTS.md 7.3)
+7,118,MP3QURAN,120,2,MURATTAL,,,,another riwayah of a requested reciter - listening only (the author 2026-11-22)
+8,118,MP3QURAN,269,13,MURATTAL,,,,another riwayah of a requested reciter - listening only (the author 2026-11-22)
+9,118,MP3QURAN,270,5,MURATTAL,,,,another riwayah of a requested reciter - listening only (the author 2026-11-22)
+10,51,MP3QURAN,53,1,MURATTAL,,,Abdul_Basit_Murattal_192kbps;Abdul_Basit_Murattal_64kbps,requested (AGENTS.md 7.3); EveryAyah Abdul_Basit_Murattal 192 and 64 kbps are the same recording: 100% of 112 sampled ayahs within 5% (2026-11-22)
+11,51,MP3QURAN,51,1,MUJAWWAD,,,,requested (AGENTS.md 7.3)
+12,51,MP3QURAN,52,2,MURATTAL,,,,another riwayah of a requested reciter - listening only (the author 2026-11-22)
+13,106,MP3QURAN,106,1,MURATTAL,,,Mohammad_al_Tablaway_128kbps;Mohammad_al_Tablaway_64kbps,requested (AGENTS.md 7.3); EveryAyah Mohammad_al_Tablaway 128 and 64 kbps are the same recording: 100% of 114 sampled ayahs within 5% (2026-11-22)
+14,106,MP3QURAN,10912,1,MUJAWWAD,,,,requested (AGENTS.md 7.3)
+15,102,MP3QURAN,102,1,MURATTAL,,,,requested (AGENTS.md 7.3)
+16,102,MP3QURAN,133,1,MUJAWWAD,,,,requested (AGENTS.md 7.3)
+17,102,MP3QURAN,103,1,MUALLIM,,,,requested - 38 surahs - included by the author 2026-11-22
+18,92,MP3QURAN,92,1,MURATTAL,,,,requested (AGENTS.md 7.3)
+19,54,MP3QURAN,54,1,MURATTAL,,,,requested (AGENTS.md 7.3)
+20,31,MP3QURAN,31,1,MURATTAL,,,Saood_ash-Shuraym_128kbps;Saood_ash-Shuraym_64kbps,requested (AGENTS.md 7.3); EveryAyah Saood_ash-Shuraym 128 and 64 kbps are the same recording: 95% and 94% of 108 sampled ayahs within 5% (2026-11-22)
+21,138,MP3QURAN,138,13,MURATTAL,,,,requested - al-Duri an Abi Amr - listening only (R5)
+22,81,MP3QURAN,81,1,MURATTAL,,,,requested (AGENTS.md 7.3)
+23,30,MP3QURAN,30,1,MURATTAL,,,,requested (AGENTS.md 7.3)
+24,74,MP3QURAN,74,1,MURATTAL,,,,requested (AGENTS.md 7.3)
+25,74,MP3QURAN,75,5,MURATTAL,,,,another riwayah of a requested reciter - listening only (the author 2026-11-22)
+26,74,MP3QURAN,305,15,MURATTAL,,,,another riwayah of a requested reciter - listening only (the author 2026-11-22)
+27,21203,MP3QURAN,10925,1,MUALLIM,,,,requested for F4 and F6 (AGENTS.md 7.3)
+28,112,EVERYAYAH,Minshawy_Mujawwad_192kbps;Minshawy_Mujawwad_64kbps,1,MUJAWWAD,حفص عن عاصم - المصحف المجود (ملف لكل آية),Minshawy Mujawwad (EveryAyah - one file per ayah),,EveryAyah folder - mp3quran's mujawwad has no timings to compare: kept apart
+29,118,EVERYAYAH,Husary_128kbps_Mujawwad;Husary_Mujawwad_64kbps,1,MUJAWWAD,حفص عن عاصم - المصحف المجود (ملف لكل آية),Husary Mujawwad (EveryAyah - one file per ayah),,EveryAyah folder - another recording than mp3quran's mujawwad (51% of 114 sampled ayahs within 5%)
+30,118,EVERYAYAH,Husary_Muallim_128kbps,1,MUALLIM,حفص عن عاصم - المصحف المعلم (ملف لكل آية),Husary (Muallim) (EveryAyah - one file per ayah),,EveryAyah folder - al-Husary's muallim mushaf (F4) exists on EveryAyah only
+31,51,EVERYAYAH,Abdul_Basit_Mujawwad_128kbps,1,MUJAWWAD,حفص عن عاصم - المصحف المجود (ملف لكل آية),Abdul Basit Mujawwad (EveryAyah - one file per ayah),,EveryAyah folder - 88.5% of 113 sampled ayahs within 5% of mp3quran's mujawwad: below the 90% rule so kept apart
+32,102,EVERYAYAH,MaherAlMuaiqly128kbps;Maher_AlMuaiqly_64kbps,1,,حفص عن عاصم (ملف لكل آية),Maher Al Muaiqly (EveryAyah - one file per ayah),,EveryAyah folder - style not stated by EveryAyah; not the recording of mp3quran's mujawwad (27%)
+33,92,EVERYAYAH,Yasser_Ad-Dussary_128kbps,1,,حفص عن عاصم (ملف لكل آية),Yasser Ad-Dussary (EveryAyah - one file per ayah),,EveryAyah folder - style not stated; another recording than mp3quran's (56%)
+34,54,EVERYAYAH,Abdurrahmaan_As-Sudais_192kbps;Abdurrahmaan_As-Sudais_64kbps,1,,حفص عن عاصم (ملف لكل آية),Abdurrahmaan As-Sudais (EveryAyah - one file per ayah),,EveryAyah folder - style not stated; another recording than mp3quran's (39 - 43%)
+35,81,EVERYAYAH,Fares_Abbad_64kbps,1,,حفص عن عاصم (ملف لكل آية),Fares Abbad (EveryAyah - one file per ayah),,EveryAyah folder - style not stated; another recording than mp3quran's (27%)
+36,30,EVERYAYAH,Ghamadi_40kbps,1,,حفص عن عاصم (ملف لكل آية),Ghamadi (EveryAyah - one file per ayah),,EveryAyah folder named only Ghamadi - 75% of 108 sampled ayahs within 5% of Saad al-Ghamdi's mp3quran timings (controls 15 - 23%): the same reciter
+37,21203,EVERYAYAH,Ayman_Sowaid_64kbps,1,,حفص عن عاصم (ملف لكل آية),Ayman Sowaid (EveryAyah - one file per ayah),,EveryAyah folder - style not stated; mp3quran's muallim has no timings to compare: kept apart

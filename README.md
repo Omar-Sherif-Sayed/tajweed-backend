@@ -18,6 +18,9 @@ The whole product — its rules, decisions, design and plan — is described in 
 | `GET /v1/pages/{page}` | the ayahs that start on a page of the Madinah mushaf (1 – 604) |
 | `GET /v1/juzs` | where each of the 30 juz starts |
 | `GET /v1/quran-search?q=…` | one search box: words with or without tashkeel (the ayahs that contain them, with the words to highlight, page by page), a surah name (Arabic or Latin), or a reference (`2:255`, «البقرة 255») |
+| `GET /v1/reciters` · `GET /v1/reciters/{id}` | the reciters, each with his recitations: the riwayah said plainly (its name, rawi and qari; *listening only* when it is not Hafs, the riwayah of the displayed text), the style, how many surahs, whether ayah timings exist |
+| `GET /v1/recitations/{id}` | one recitation: the surahs it holds, its audio sources in the order a player tries them (with their daily health check), its credits |
+| `GET /v1/recitations/{id}/surahs/{surah}/timings` | when each ayah starts and ends in the surah file (mp3quran's timings, checked against the Tanzil ayah count) |
 | `GET /v1/content-version` | a fingerprint of the content's sources — the apps refresh their copies when it changes |
 | `GET /actuator/health` | `UP` when the application and its database are working |
 | `GET /swagger-ui.html` · `GET /v3/api-docs` | the API's documentation and its OpenAPI contract |
@@ -79,6 +82,7 @@ variables. The settings:
 | `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | the database | — (required) |
 | `CORS_ORIGINS` | the web application's addresses, comma-separated | `http://localhost:4200` |
 | `RATE_LIMIT_PER_MINUTE` | requests one client may send each minute | `120` |
+| `AUDIO_HEALTH_ENABLED`, `AUDIO_HEALTH_CRON`, `AUDIO_HEALTH_TIMEOUT` | the daily check of the audio sources: on or off, when (Spring cron, UTC), how long one request may take | `true`, `0 30 3 * * *`, `20s` |
 | `SERVER_FORWARDEDHEADERSSTRATEGY` | `native` when the API runs behind a reverse proxy | `none` |
 | `SWAGGER_UI_ENABLED`, `API_DOCS_ENABLED` | the documentation page and the OpenAPI document | `true` |
 

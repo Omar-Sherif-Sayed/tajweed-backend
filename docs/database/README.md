@@ -19,6 +19,8 @@ a simple edit of these migrations.
 | 1.1.1 | `db/migration/V1_1_1__ImportQuranText.java` | imports the Quran text and metadata after verifying every file's SHA-256 and every count |
 | 1.2.0 | `V1_2_0__create_ayah_search_text_table.sql` | the table `ayah_search_text` |
 | 1.2.1 | `db/migration/V1_2_1__ImportQuranSearchText.java` | imports Tanzil «Simple» and «Simple (Clean)» after verifying both SHA-256 and that both have the 6,236 ayahs in the order of `ayah`; records the two files in `content_source` |
+| 1.3.0 | `V1_3_0__create_reciter_tables.sql` | the reciter module's tables, `audio_source_check` and `shedlock` |
+| 1.3.1 | `db/migration/V1_3_1__ImportRecitations.java` | imports the reciter catalogue and the timings after verifying every file's SHA-256, every choice of the selection against the sources, every audio file's check and every timing file's ayah count |
 
 ## `content_source` — every file the content comes from (module `source`)
 
@@ -81,7 +83,84 @@ the search tidies it in memory (`ArabicSearchNormalizer`), never in the table.
 
 No index in the database: the search reads the 6,236 rows once and keeps a tidied copy in memory (about 2 MB).
 
+## The `reciter` module (F3, F4, F11, since 1.3.0)
+
+Designed on 2026-11-22 and approved by the author («Yes, reciters next», then his four answers — documentation
+repository, `docs/plan/backend-plan.md` §13). Written by `V1_3_1__ImportRecitations` from the sources' answers as
+received (`docs/data-sources/README.md`); the code only reads them, except the two run-time tables at the end.
+
+### `riwayah` — the riwayat the recitations use
+
+| Column | Type | Value and source |
+| --- | --- | --- |
+| `pk_id` | smallint | mp3quran's riwayah id (1 = Hafs an Asim) |
+| `name_ar` | varchar(100) | mp3quran's Arabic name, verbatim («ورش عن نافع») |
+| `name_en` | varchar(150) | mp3quran's English name, verbatim |
+| `rawi_ar` | varchar(50) | the part of the Arabic name before «عن» — the rawi |
+| `qari_ar` | varchar(50) | the part after «عن» — the qari |
+| `matches_displayed_text` | boolean | true only for Hafs an Asim, the riwayah of the shipped Tanzil text; the others are listening only (`AGENTS.md` §6.7) |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+### `reciter`
+
+| Column | Type | Value and source |
+| --- | --- | --- |
+| `pk_id` | smallint | our id, in the order of the selection |
+| `name_ar`, `name_en` | varchar(100) | mp3quran's names (Arabic and English catalogues) |
+| `mp3quran_id` | integer | his id on mp3quran (`uk_reciter_mp3quran_id`) |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+### `recitation` — one reciter, one riwayah, one style, its surahs and sources
+
+| Column | Type | Value and source |
+| --- | --- | --- |
+| `pk_id` | smallint | our id, the selection's (`content/reviewed/recitations.csv`) |
+| `reciter_id` | smallint | → `reciter` |
+| `riwayah_id` | smallint | → `riwayah`; for an mp3quran moshaf its `rewaya_id`, checked against the selection and against the moshaf's label |
+| `style` | varchar(10), null | `MURATTAL` / `MUJAWWAD` / `MUALLIM` as the label names it; null when it names none (al-Minshawi's 1967 recording) |
+| `name_ar`, `name_en` | varchar(150) | the source's label (mp3quran: «حفص عن عاصم - مرتل»); for an EveryAyah folder, the selection's label |
+| `provider` | varchar(10) | `MP3QURAN` (surah files) or `EVERYAYAH` (ayah files) |
+| `mp3quran_moshaf_id` | integer, null | mp3quran's moshaf id (`uk_recitation_mp3quran_moshaf_id`) |
+| `surah_count` | smallint | how many surahs it holds |
+| `has_timings` | boolean | whether ayah timings were imported |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+### `recitation_surah` — which surahs a recitation holds
+
+`pk_id` serial · `recitation_id` → `recitation` · `surah_id` → `surah` (`uk_recitation_surah`) · audit. A surah is
+listed only when its audio file answered `200` with audio on the check day (`content/reviewed/audio-check.csv`).
+
+### `audio_source` — where the files are, in the order the players try them (F11)
+
+| Column | Type | Value and source |
+| --- | --- | --- |
+| `pk_id` | serial | |
+| `recitation_id` | smallint | → `recitation` |
+| `priority` | smallint | 1 first (`uk_audio_source_priority` with the recitation) |
+| `kind` | varchar(10) | `SURAH_FILE` / `AYAH_FILE` |
+| `provider` | varchar(10) | `MP3QURAN` / `EVERYAYAH` |
+| `url_template` | varchar(300) | mp3quran: its `server` + `{surah}.mp3`; EveryAyah: `https://everyayah.com/data/<folder>/{surah}{ayah}.mp3` — `{surah}`, `{ayah}` as three digits |
+| `bitrate_kbps` | smallint, null | EveryAyah's stated bitrate; mp3quran states none |
+| `download_allowed` | boolean | false for every source until its owner allows offline downloads in writing (F28) |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+### `ayah_timing` — mp3quran's ayah timings (Hafs recitations only)
+
+`pk_id` serial · `recitation_id` · `surah_id` · `ayah_number` (0 = what is recited before ayah 1) · `start_ms` ·
+`end_ms` (`ck_ayah_timing_order`: end after start; `uk_ayah_timing`) · audit. Only the ayah number and its two times
+are taken from each file; mp3quran's page drawings are not. A surah's timings are imported only when they hold every
+ayah of the Tanzil count and the times go forward; the ones that do not are listed with their reason in
+`content/reviewed/timing-exclusions.csv`, and the import refuses both an unlisted failure and a listed surah that passes.
+
+### Run-time state (never content)
+
+- `audio_source_check` — `audio_source_id` (primary key, → `audio_source`) · `status` (`OK` / `FAILING`) ·
+  `consecutive_failures` · `last_checked_at` · `last_ok_at` · audit. Written by the daily health check
+  (`AudioSourceHealthChecker`): one `HEAD` of the source's first file; `FAILING` after three failures in a row.
+- `shedlock` — ShedLock's own table, in its documented layout (`name`, `lock_until`, `locked_at`, `locked_by`), so
+  that a scheduled job runs on one instance only. The one table without `pk_id` and audit columns: its layout is the
+  library's.
+
 ## Planned (not created yet)
 
-- The **reciter** module (F3, F4, F11): reciters, recitations (style, riwayah, completeness), audio sources and ayah
-  timings — from mp3quran.net (rights clause read 2026-11-20) and `AGENTS.md` §7.3.
+- The radio module (F7), tafsir (F5) and the other modules of `AGENTS.md` §9, each written here first.

@@ -19,6 +19,15 @@ public enum ErrorCode {
     /** The surah exists, but has no ayah with this number (for example 1:8 — Al-Fatihah has 7 ayahs). */
     NOT_FOUND_AYAH(HttpStatus.NOT_FOUND, "error.not_found_ayah"),
 
+    /** No reciter has this id. */
+    NOT_FOUND_RECITER(HttpStatus.NOT_FOUND, "error.not_found_reciter"),
+
+    /** No recitation has this id. */
+    NOT_FOUND_RECITATION(HttpStatus.NOT_FOUND, "error.not_found_recitation"),
+
+    /** The recitation has no ayah timings for this surah (it has none at all, or not this surah). */
+    NOT_FOUND_TIMINGS(HttpStatus.NOT_FOUND, "error.not_found_timings"),
+
     /** The request is malformed: a missing or invalid parameter, a body that cannot be read. */
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "error.invalid_request"),
 

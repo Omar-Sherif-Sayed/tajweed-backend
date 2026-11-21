@@ -17,6 +17,9 @@ tags:
     \ from Tanzil."
 - name: App info
   description: "The application's name, author, API version and languages."
+- name: Reciters
+  description: "Reciters, recitations (riwayah, style, surahs), audio sources and\
+    \ ayah timings."
 - name: Content
   description: The content's version and its sources.
 paths:
@@ -181,6 +184,214 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BaseResponseDtoAyah"
+  /v1/reciters:
+    get:
+      tags:
+      - Reciters
+      summary: "The reciters, each with his recitations: riwayah, style, surahs, timings"
+      operationId: getReciters
+      parameters:
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseListDtoReciter"
+  /v1/reciters/{reciterId}:
+    get:
+      tags:
+      - Reciters
+      summary: One reciter with his recitations
+      operationId: getReciter
+      parameters:
+      - name: reciterId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoReciter"
+  /v1/recitations/{recitationId}:
+    get:
+      tags:
+      - Reciters
+      summary: "A recitation: riwayah, surahs, audio sources in order with their health,\
+        \ credits"
+      operationId: getRecitation
+      parameters:
+      - name: recitationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoRecitation"
+  /v1/recitations/{recitationId}/surahs/{surahNumber}/timings:
+    get:
+      tags:
+      - Reciters
+      summary: The ayah timings of one surah of a recitation (milliseconds in the
+        surah file)
+      operationId: getTimings
+      parameters:
+      - name: recitationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: surahNumber
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+          maximum: 114
+          minimum: 1
+      - name: Accept-Language
+        in: header
+        description: The language of the texts in the answer; Arabic when absent or
+          not supported.
+        required: false
+        schema:
+          type: string
+          default: ar
+          enum:
+          - ar
+          - en
+          - ru
+          - es
+          - de
+          - it
+          - fr
+          - ur
+          - hi
+          - ko
+          - id
+          - ja
+          - zh
+          - tr
+          - bn
+          - fa
+          - ms
+          - sw
+          - ha
+          - pt
+          - ps
+          - uz
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponseDtoSurahTimings"
   /v1/quran-search:
     get:
       tags:
@@ -587,6 +798,213 @@ components:
           type: string
         data:
           $ref: "#/components/schemas/DtoAyah"
+    BaseResponseListDtoReciter:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoReciter"
+    DtoRecitationSummary:
+      type: object
+      description: "A recitation: label, style, riwayah, completeness, timings."
+      properties:
+        id:
+          type: integer
+          format: int32
+        reciterId:
+          type: integer
+          format: int32
+        nameAr:
+          type: string
+        nameEn:
+          type: string
+        style:
+          type: string
+          enum:
+          - MURATTAL
+          - MUJAWWAD
+          - MUALLIM
+        riwayah:
+          $ref: "#/components/schemas/DtoRiwayah"
+        provider:
+          type: string
+          enum:
+          - MP3QURAN
+          - EVERYAYAH
+        listeningOnly:
+          type: boolean
+        surahCount:
+          type: integer
+          format: int32
+        complete:
+          type: boolean
+        hasTimings:
+          type: boolean
+    DtoReciter:
+      type: object
+      description: A reciter and his recitations.
+      properties:
+        id:
+          type: integer
+          format: int32
+        nameAr:
+          type: string
+        nameEn:
+          type: string
+        recitations:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoRecitationSummary"
+    DtoRiwayah:
+      type: object
+      description: "A riwayah: its name, rawi and qari, and whether it is the riwayah\
+        \ of the displayed text (Hafs)."
+      properties:
+        id:
+          type: integer
+          format: int32
+        nameAr:
+          type: string
+        nameEn:
+          type: string
+        rawiAr:
+          type: string
+        qariAr:
+          type: string
+        matchesDisplayedText:
+          type: boolean
+    BaseResponseDtoReciter:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoReciter"
+    BaseResponseDtoRecitation:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoRecitation"
+    DtoAudioSource:
+      type: object
+      description: "An audio source: its address template, provider, bitrate and health."
+      properties:
+        priority:
+          type: integer
+          format: int32
+        kind:
+          type: string
+          enum:
+          - SURAH_FILE
+          - AYAH_FILE
+        provider:
+          type: string
+          enum:
+          - MP3QURAN
+          - EVERYAYAH
+        urlTemplate:
+          type: string
+        bitrateKbps:
+          type: integer
+          format: int32
+        downloadAllowed:
+          type: boolean
+        status:
+          type: string
+          enum:
+          - OK
+          - FAILING
+        lastCheckedAt:
+          type: string
+          format: date-time
+    DtoRecitation:
+      type: object
+      description: "A recitation, its surahs, its audio sources in order and its credits."
+      properties:
+        recitation:
+          $ref: "#/components/schemas/DtoRecitationSummary"
+        reciterNameAr:
+          type: string
+        reciterNameEn:
+          type: string
+        surahs:
+          type: array
+          items:
+            type: integer
+            format: int32
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoAudioSource"
+        credits:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoContentSource"
+    BaseResponseDtoSurahTimings:
+      type: object
+      description: "The envelope of every answer: success flag, code, message in the\
+        \ request's language, data."
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/DtoSurahTimings"
+    DtoAyahTiming:
+      type: object
+      description: An ayah's start and end in milliseconds.
+      properties:
+        ayah:
+          type: integer
+          format: int32
+        startMs:
+          type: integer
+          format: int32
+        endMs:
+          type: integer
+          format: int32
+    DtoSurahTimings:
+      type: object
+      description: The ayah timings of one surah of a recitation.
+      properties:
+        recitationId:
+          type: integer
+          format: int32
+        surahNumber:
+          type: integer
+          format: int32
+        timings:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoAyahTiming"
+        source:
+          $ref: "#/components/schemas/DtoContentSource"
     BaseResponseDtoQuranSearch:
       type: object
       description: "The envelope of every answer: success flag, code, message in the\

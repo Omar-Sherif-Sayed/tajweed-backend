@@ -4,8 +4,10 @@
 > metadata imported byte for byte after checksum and count checks (6,236 ayahs, 604 pages, 30 juz, 240 quarters with
 > the reviewed 15:49 correction), served by `/v1/surahs`, `/v1/pages/{page}`, `/v1/juzs`; the `source` module with
 > `GET /v1/content-version`; **Quran search** (F16): Tanzil «Simple» and «Simple (Clean)» imported verbatim as the
-> search text, `GET /v1/quran-search`. 75 tests green (every ayah and every search-text row compared with its file;
-> ten reference queries). Next: the `reciter` module, the API contract for phase 1.
+> search text, `GET /v1/quran-search`; **the `reciter` module** (2026-11-22): 13 reciters, 37 recitations (27 from
+> mp3quran, 10 EveryAyah folders), each riwayah said plainly (non-Hafs = listening only), 8,926 audio files checked,
+> 74,977 ayah timings, a daily health check of the sources (ShedLock). 90 tests green. Next: the API contract for
+> phase 1 (`P0-14`).
 
 ## Read first
 
@@ -52,11 +54,14 @@ every library, is `docs/plan/backend-plan.md` of the documentation repository.
 | ArchUnit | 1.5.1 | `ext.archunitVersion` |
 | Checkstyle | 14.4.0 | `checkstyle.toolVersion` |
 | PostgreSQL | 18 (`postgres:18` image; 18.7 on 2026-11-21) | `compose.yaml`, `TestcontainersConfiguration` |
+| ShedLock | 7.11.0 (2026-11-22) | `ext.shedlockVersion` |
 | Runtime image | `eclipse-temurin:25-jre` | `Dockerfile` |
 | CI actions | checkout v7, setup-java v6, gradle/actions v6, upload-artifact v7 | `.github/workflows/ci.yml` |
 
-Not yet added (each comes with its first use, with its version checked that day): ShedLock (first scheduler — radio
-health checks), WireMock and the HTTP interface clients (first external API — mp3quran, Quran Foundation, Dorar).
+Added 2026-11-22 with its first use: **ShedLock 7.11.0** (`shedlock-spring`, `shedlock-provider-jdbc-template`; checked
+on Maven Central that day) for the daily health check of the audio sources. The check itself uses the JDK's
+`HttpClient` (one `HEAD` per source), and its test a local JDK `HttpServer` — no WireMock needed yet. Not yet added:
+WireMock and the HTTP interface clients (first external API called at run time — Quran Foundation, Dorar).
 
 ## Structure
 
@@ -84,14 +89,22 @@ src/main/java/io/github/omarsherifsayed/tajweed/
                              /v1/pages/{page}, /v1/juzs (entity, enums, repository + projections, services, mapper)
                              · GET /v1/quran-search — search/: ArabicSearchNormalizer (the one tidying function),
                              QuranSearchIndex (in memory, built on the first search), SurahNameMatcher (names, references)
+    reciter/                 riwayah, reciter, recitation, recitation_surah, audio_source, ayah_timing:
+                             GET /v1/reciters, /v1/reciters/{id}, /v1/recitations/{id}, …/surahs/{n}/timings
+                             · scheduler/: AudioSourceHealthChecker (one HEAD per source), AudioSourceHealthScheduler
+                             (daily, ShedLock), AudioHealthProperties (tajweed.audio-health.*)
 src/main/java/db/migration/  Java migrations that import content: V1_1_1__ImportQuranText (checksums, counts, insert),
-                             V1_2_1__ImportQuranSearchText (the search text, same checks)
+                             V1_2_1__ImportQuranSearchText (the search text, same checks), V1_3_1__ImportRecitations
+                             (the reciter catalogue: every choice checked against the sources, every timing file
+                             against the Tanzil ayah count)
 src/main/resources/
   application.properties     every setting, with its environment variable
   db/migration/              V1_0_0__baseline.sql, V1_1_0__create_content_source_and_quran_tables.sql …
   content/                   source files, byte for byte (-text in .gitattributes): tanzil/quran-uthmani.txt,
                              tanzil/quran-data.xml, tanzil/quran-simple.txt, tanzil/quran-simple-clean.txt,
-                             reviewed/hizb-quarter-corrections.csv — docs/data-sources/README.md
+                             reviewed/hizb-quarter-corrections.csv; mp3quran/ (catalogue, riwayat, 1,482 timing
+                             files + SHA256SUMS), everyayah/recitations.js, reviewed/recitations.csv,
+                             timing-exclusions.csv, audio-check.csv — docs/data-sources/README.md
   i18n/                      messages.properties (Arabic, default) + messages_<code>.properties × 21
 src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegrationTest (tag integration)
 ```
@@ -128,6 +141,14 @@ src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegr
   tidied query inside the tidied ayah. `src/test/resources/search/reference-queries.csv` holds ten queries with
   their counts, computed by an independent implementation; the clients will run the same list. Changing a rule
   means changing that file too, with the reason.
+- **Recitations** (parent `AGENTS.md` §6.7, §7.3; the author, 2026-11-22): every recitation says its riwayah
+  plainly (`DtoRiwayah`: mp3quran's name, the rawi and the qari taken from it, `matchesDisplayedText`); one that is not
+  Hafs is `listeningOnly` — played, never followed or highlighted over the Hafs text. Timings only for Hafs. Labels
+  and names are the sources' own. An EveryAyah folder is a fallback of an mp3quran recitation only when measured to be
+  the same recording (`docs/data-sources/README.md`); otherwise it is its own recitation. `download_allowed` is false
+  for every source until its owner allows offline downloads in writing (F28).
+- **Run-time state is kept apart from content**: `audio_source_check` (written by the health check) is the one table
+  the code writes; the content tables stay `@Immutable`.
 - **Every Quran answer carries `textSource`** (Tanzil's name and link — its licence requires them to be shown).
 - **Logs**: identifiers and timings, never request bodies, secrets or IP addresses.
 - **Tests**: given / when / then; class Javadoc + `@DisplayName`; unit tests need no database or network; integration
@@ -159,9 +180,20 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 | `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | the production database | local: from `compose.yaml` |
 | `CORS_ORIGINS` | the web application's origins, comma-separated | `http://localhost:4200` |
 | `RATE_LIMIT_PER_MINUTE` | requests per client per minute on `/v1/**` | `120` |
+| `AUDIO_HEALTH_ENABLED`, `AUDIO_HEALTH_CRON`, `AUDIO_HEALTH_TIMEOUT` | the daily `HEAD` check of every audio source (ShedLock: one instance) | `true`, `0 30 3 * * *` (UTC), `20s` |
 | `SERVER_FORWARDEDHEADERSSTRATEGY` | `native` behind a reverse proxy (the client's address for the rate limit) | `none` |
 | `SWAGGER_UI_ENABLED`, `API_DOCS_ENABLED` | the Swagger page and the OpenAPI document | `true` |
 | (later) `DORAR_API_KEY`, `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_ENV` | external APIs — never in a file | — |
+
+## Verified on 2026-11-22 (the reciter module)
+
+- `./gradlew build jacocoTestReport integrationTest`: 90 tests, 0 failures — with the reciters: 13 reciters,
+  7 non-Hafs recitations listening only, al-Muaiqli's muallim 38 surahs and al-Minshawi's 1967 recording 110,
+  every timing of al-Minshawi's Al-Baqarah equal to mp3quran's file (287 rows), al-Husary's Warsh recitation
+  «ورش عن نافع» with rawi «ورش» and qari «نافع», the excluded at-Tawbah answering `404 NOT_FOUND_TIMINGS`; the health
+  check against a local HTTP server (200 audio works; HTML, 404, no answer do not; three failures → `FAILING`).
+- Data checked before the import: all 8,926 audio files answered `200 audio/mpeg`; 1,482 timing files, of which 119
+  surahs fail the ayah count (Ali al-Hudhaifi's 112 of 114 — excluded whole — and 7 others), listed with reasons.
 
 ## Verified on 2026-11-21
 
