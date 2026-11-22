@@ -33,6 +33,7 @@ ext {
     bucket4jVersion = '8.22.0'      // rate limiting
     archunitVersion = '1.5.1'       // architecture rules checked by a test
     shedlockVersion = '7.11.0'      // one instance runs a scheduled job (checked on Maven Central 2026-11-22)
+    sqliteJdbcVersion = '3.54.1.0'  // the phones' Quran bundle only — never in the application (checked 2026-11-22)
 }
 
 dependencies {
@@ -143,4 +144,32 @@ tasks.named('check') {
 }
 tasks.named('checkstyleTest') {
     configFile = file('config/checkstyle/checkstyle-test.xml')
+}
+
+// The Quran bundle of the phone applications (content pipeline D1): a SQLite file written by the server's own import
+// migrations, then checked against the Tanzil files. A build tool in its own source set — its SQLite driver never
+// enters the application. Output: build/bundle/tajweed-quran.sqlite and its manifest; part of every build.
+sourceSets {
+    bundle {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+dependencies {
+    bundleImplementation 'org.flywaydb:flyway-core'
+    bundleImplementation "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}"
+}
+tasks.register('quranBundle', JavaExec) {
+    description = 'Writes the phones\' Quran bundle (SQLite) with the server\'s import migrations, and checks it.'
+    group = 'build'
+    classpath = sourceSets.bundle.runtimeClasspath
+    mainClass = 'io.github.omarsherifsayed.tajweed.bundle.QuranBundleBuilder'
+    jvmArgs '--enable-native-access=ALL-UNNAMED'   // the SQLite driver loads its native library
+    def out = layout.buildDirectory.dir('bundle')
+    args out.get().asFile.absolutePath
+    inputs.files(sourceSets.bundle.runtimeClasspath)
+    outputs.dir(out)
+}
+tasks.named('check') {
+    dependsOn tasks.named('quranBundle')
 }

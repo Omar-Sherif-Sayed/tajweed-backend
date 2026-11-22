@@ -6,8 +6,9 @@
 > `GET /v1/content-version`; **Quran search** (F16): Tanzil «Simple» and «Simple (Clean)» imported verbatim as the
 > search text, `GET /v1/quran-search`; **the `reciter` module** (2026-11-22): 13 reciters, 37 recitations (27 from
 > mp3quran, 10 EveryAyah folders), each riwayah said plainly (non-Hafs = listening only), 8,926 audio files checked,
-> 74,977 ayah timings, a daily health check of the sources (ShedLock). 90 tests green. Next: the API contract for
-> phase 1 (`P0-14`).
+> 74,977 ayah timings, a daily health check of the sources (ShedLock). 90 tests green. **2026-11-22: the phase 1 contract** — `docs/api/client-guide.md` — and
+> **the phones' Quran bundle** (`./gradlew quranBundle`, SQLite written by the import migrations themselves).
+> Next: the web scaffold (`P0-08`).
 
 ## Read first
 
@@ -55,6 +56,7 @@ every library, is `docs/plan/backend-plan.md` of the documentation repository.
 | Checkstyle | 14.4.0 | `checkstyle.toolVersion` |
 | PostgreSQL | 18 (`postgres:18` image; 18.7 on 2026-11-21) | `compose.yaml`, `TestcontainersConfiguration` |
 | ShedLock | 7.11.0 (2026-11-22) | `ext.shedlockVersion` |
+| sqlite-jdbc (the `bundle` source set only) | 3.54.1.0 (2026-11-22) | `ext.sqliteJdbcVersion` |
 | Runtime image | `eclipse-temurin:25-jre` | `Dockerfile` |
 | CI actions | checkout v7, setup-java v6, gradle/actions v6, upload-artifact v7 | `.github/workflows/ci.yml` |
 
@@ -106,6 +108,8 @@ src/main/resources/
                              files + SHA256SUMS), everyayah/recitations.js, reviewed/recitations.csv,
                              timing-exclusions.csv, audio-check.csv — docs/data-sources/README.md
   i18n/                      messages.properties (Arabic, default) + messages_<code>.properties × 21
+src/bundle/java/…            the phones' Quran bundle (QuranBundleBuilder): a build tool with its own source set,
+                             so its SQLite driver never enters the application — ./gradlew quranBundle
 src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegrationTest (tag integration)
 ```
 
@@ -149,6 +153,13 @@ src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegr
   for every source until its owner allows offline downloads in writing (F28).
 - **Run-time state is kept apart from content**: `audio_source_check` (written by the health check) is the one table
   the code writes; the content tables stay `@Immutable`.
+- **The phones' Quran bundle** (`src/bundle`, `QuranBundleBuilder`): SQLite tables with the server's column names,
+  filled by running `V1_1_1__ImportQuranText` and `V1_2_1__ImportQuranSearchText` on them, then checked against the
+  Tanzil files line by line; reproducible (the audit dates are the newest source's date, not the clock). A change to
+  those tables means a change here too, and `SCHEMA_VERSION` raised. Part of `./gradlew build`; CI keeps it as the
+  artifact `quran-bundle`.
+- **The clients' contract** is `docs/api/openapi.yaml` (generated) plus `docs/api/client-guide.md` (how to use it) —
+  a change of behaviour updates the guide in the same commit.
 - **Every Quran answer carries `textSource`** (Tanzil's name and link — its licence requires them to be shown).
 - **Logs**: identifiers and timings, never request bodies, secrets or IP addresses.
 - **Tests**: given / when / then; class Javadoc + `@DisplayName`; unit tests need no database or network; integration
@@ -184,6 +195,11 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 | `SERVER_FORWARDEDHEADERSSTRATEGY` | `native` behind a reverse proxy (the client's address for the rate limit) | `none` |
 | `SWAGGER_UI_ENABLED`, `API_DOCS_ENABLED` | the Swagger page and the OpenAPI document | `true` |
 | (later) `DORAR_API_KEY`, `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_ENV` | external APIs — never in a file | — |
+
+## Verified on 2026-11-22 (the bundle)
+
+- `./gradlew quranBundle`: `tajweed-quran.sqlite` 4,415,488 bytes, the same SHA-256 on two runs; 6,236 ayahs and both
+  search texts equal to the Tanzil files; `pragma integrity_check` ok; 2:255 on page 42, juz 3.
 
 ## Verified on 2026-11-22 (the reciter module)
 

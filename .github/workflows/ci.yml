@@ -1,5 +1,6 @@
 # CI of tajweed-backend: on every push and pull request to main —
-#   1. build, unit tests, Javadoc checks (Checkstyle + the Javadoc tool), JaCoCo report   (./gradlew build)
+#   1. build, unit tests, Javadoc checks (Checkstyle + the Javadoc tool), JaCoCo report, and the phones' Quran
+#      bundle — written by the import migrations and checked against the Tanzil files      (./gradlew build)
 #   2. integration tests on a real PostgreSQL 18 in Docker (Testcontainers)               (./gradlew integrationTest)
 #   3. the OpenAPI contract: the integration test rewrites docs/api/openapi.yaml; the job fails when the committed file
 #      differs, so the three clients always read the contract of the code that is in main.
@@ -40,6 +41,13 @@ jobs:
 
       - name: The OpenAPI contract is up to date
         run: git diff --exit-code -- docs/api/openapi.yaml
+
+      - name: The phones' Quran bundle (SQLite and its manifest)
+        uses: actions/upload-artifact@v7
+        with:
+          name: quran-bundle
+          path: build/bundle/
+          retention-days: 90
 
       - name: Test and coverage reports
         if: always()

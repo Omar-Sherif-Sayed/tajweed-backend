@@ -25,6 +25,11 @@ The whole product — its rules, decisions, design and plan — is described in 
 | `GET /actuator/health` | `UP` when the application and its database are working |
 | `GET /swagger-ui.html` · `GET /v3/api-docs` | the API's documentation and its OpenAPI contract |
 
+How the web, Android and iPhone clients use these endpoints — caching, errors, the reader, search, playback and
+failover — is in [`docs/api/client-guide.md`](docs/api/client-guide.md). The phones ship the Quran offline as a SQLite
+file this repository builds: `./gradlew quranBundle` → `build/bundle/tajweed-quran.sqlite` (also kept by CI as the
+artifact `quran-bundle`).
+
 Every answer is wrapped in the same envelope:
 
 ```json
