@@ -28,6 +28,18 @@ public enum ErrorCode {
     /** The recitation has no ayah timings for this surah (it has none at all, or not this surah). */
     NOT_FOUND_TIMINGS(HttpStatus.NOT_FOUND, "error.not_found_timings"),
 
+    /** No radio station has this id. */
+    NOT_FOUND_RADIO(HttpStatus.NOT_FOUND, "error.not_found_radio"),
+
+    /** No hadith has this id (or it has not been fetched from HadeethEnc yet). */
+    NOT_FOUND_HADITH(HttpStatus.NOT_FOUND, "error.not_found_hadith"),
+
+    /** No hadith category has this id. */
+    NOT_FOUND_HADITH_CATEGORY(HttpStatus.NOT_FOUND, "error.not_found_hadith_category"),
+
+    /** No tafsir has this id. */
+    NOT_FOUND_TAFSIR(HttpStatus.NOT_FOUND, "error.not_found_tafsir"),
+
     /** The request is malformed: a missing or invalid parameter, a body that cannot be read. */
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "error.invalid_request"),
 

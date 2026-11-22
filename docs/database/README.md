@@ -161,6 +161,97 @@ ayah of the Tanzil count and the times go forward; the ones that do not are list
   that a scheduled job runs on one instance only. The one table without `pk_id` and audit columns: its layout is the
   library's.
 
+### Recitation 38 (1.3.2, 2026-11-22)
+
+`V1_3_2__AddHudhaifyRecitation` adds the rows of `content/reviewed/recitations-added.csv` with the checks of 1.3.1:
+EveryAyah's folders named only «Hudhaify» (128, 64 and 32 kbps), which the author identified on 2026-11-22 as Sheikh
+Ali al-Hudhaifi — Hafs, its own recitation (not a fallback: the recording cannot be compared with mp3quran's, whose
+timings for him fail the ayah count), 114 surahs, three audio sources.
+
+## The radio module (1.4.0 / 1.4.1, 2026-11-22) — F7
+
+The author's answer (2026-11-22): **recitation only**. `V1_4_1__ImportRadios` reads mp3quran's two radio lists and our
+decision for every channel (`content/reviewed/radios.csv`); a channel added by mp3quran stops the import until it is
+decided. A kept channel must have answered with audio on the check day (`content/reviewed/radio-check.csv`).
+
+### `radio_station`
+
+| Column | Type | Value and source |
+| --- | --- | --- |
+| `pk_id` | smallint | our id, in mp3quran's order |
+| `provider` | varchar(10) | `MP3QURAN` |
+| `provider_key` | integer | mp3quran's channel id (`uk_radio_station_provider_key` with the provider) |
+| `kind` | varchar(10) | `RECITER` (one reciter), `RECITERS` (several), `NATIONAL` (a country's station — none yet) |
+| `reciter_id` | smallint, null | → `reciter`, when the channel is one of our 13 reciters |
+| `riwayah_id` | smallint, null | → `riwayah`, only when the channel names it (5 channels: Warsh ×2, Khalaf, al-Susi, Qalun); the missing riwayat were added from mp3quran's list |
+| `name_ar`, `name_en` | varchar(200) | mp3quran's names |
+| `country_code` | varchar(2), null | a national station's country — required exactly for `NATIONAL` (`ck_radio_station_country`) |
+| `broadcaster_url` | varchar(300), null | a national station's own page |
+| `sort_order` | smallint | the place in the list (`uk_radio_station_sort_order`) |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+### `radio_stream`
+
+`pk_id` (serial) · `station_id` (→ `radio_station`) · `url` (varchar(300), as mp3quran publishes it) · `priority`
+(1 first; `uk_radio_stream_priority`) · audit. One stream per station today.
+
+### `radio_stream_check` — run-time state
+
+`stream_id` (primary key, → `radio_stream`) · `status` (`OK` / `FAILING`) · `consecutive_failures` · `last_checked_at` ·
+`last_ok_at` · audit. Written by the daily check (`RadioStreamHealthChecker`: a `GET` whose first 4 KB are read, up to
+three tries — mp3quran's server answers `500` at times); `FAILING` after three failed days in a row.
+
+## Content fetched at run time (1.5.0, 1.6.0, 2026-11-22)
+
+These tables are filled by the running backend from their owners' APIs — **no migration writes their rows, and none
+of their content is in a file of this repository**: HadeethEnc by the author's decision (their permission of
+2026-11-22: database only), the Quran Foundation by its terms (Content Sync only).
+
+### `content_sync` — the state of every sync
+
+| Column | Type | Value |
+| --- | --- | --- |
+| `pk_id` | serial | |
+| `code` | varchar(60) | `HADEETHENC`, `QF_TAFSIRS` (`uk_content_sync_code`) |
+| `status` | varchar(10) | `RUNNING`, `OK`, `FAILED` |
+| `last_started_at`, `last_finished_at`, `last_success_at` | timestamptz | the runs |
+| `items` | integer | rows written by the last run |
+| `sync_token` | text, null | the Quran Foundation's `next_sync_token`, to continue from |
+| `message` | varchar(500), null | an error, in a few words (never a secret) |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+### HadeethEnc (F13, F29, F35)
+
+- `hadeethenc_category` — `pk_id` (their id) · `parent_id` (null for a root) · audit.
+- `hadeethenc_category_title` — `pk_id` · `category_id` (→, cascade) · `language` · `title` (as received) · audit ·
+  `uk_hadeethenc_category_title` (category, language).
+- `hadeethenc_hadith` — `pk_id` (their id) · `listed_at` (when last seen in their list) · audit. A hadith no longer
+  listed is removed — only when the new list holds at least 90 % of the stored ones.
+- `hadeethenc_hadith_category` — `pk_id` · `hadith_id` · `category_id` (both →, cascade) · audit; from the Arabic
+  answer's `categories`.
+- `hadeethenc_hadith_text` — one row per hadith and language, **exactly as received**: `title`, `hadeeth`,
+  `hadeeth_intro`, `attribution`, `grade`, `explanation`, `hints` and `words_meanings` (the received JSON arrays, as
+  text), `reference`, `sha256` (of the whole answer), `fetched_at` · audit · `uk_hadeethenc_hadith_text`. An answer
+  without its id, title, text or grade is refused and the stored row kept.
+
+Changes from the proposal (`docs/plan/backend-plan.md` §14.2 of the documentation repository): `hints` and
+`words_meanings` are `text` holding the received JSON, not `jsonb` (they are only stored and passed on, never queried);
+`hadeethenc_hadith` has `listed_at` instead of `fetched_at` (each text has its own `fetched_at`);
+`content_sync.last_success_at` added (the schedule looks at the last success, not the last run).
+
+### The tafsirs (F5, F26)
+
+- `tafsir` — `pk_id` (the Quran Foundation's resource id) · `provider` (`QURAN_FOUNDATION`) · `name_ar`, `name_en`,
+  `author_ar`, `author_en`, `language` (as their lists give them) · `sort_order` (our choice:
+  `content/reviewed/tafsirs.csv`, `uk_tafsir_sort_order`) · audit.
+- `tafsir_text` — `pk_id` · `tafsir_id` (→, cascade) · `source_record_id` (their record id; `uk_tafsir_text_record`
+  with the tafsir) · `ayah_id`, `ayah_to_id` (→ `ayah`: the range the text covers — their `group_verse_key_from` /
+  `group_verse_key_to`, or `verse_key`; `ck_tafsir_text_range`) · `text` (as received, HTML; empty when they have none)
+  · `synced_at` · audit · index `ix_tafsir_text_ayah`. An ayah's text is the row whose range covers it.
+
+Change from the proposal: `source_record_id` added (a row change or deletion names the record), and `ayah_to` became
+`ayah_to_id` (a foreign key like `ayah_id`).
+
 ## Planned (not created yet)
 
-- The radio module (F7), tafsir (F5) and the other modules of `AGENTS.md` §9, each written here first.
+- The other modules of `AGENTS.md` §9 (adhkar, dua, library, the Lives, Dorar …), each written here first.

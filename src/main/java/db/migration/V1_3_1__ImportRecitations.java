@@ -244,7 +244,7 @@ public class V1_3_1__ImportRecitations extends BaseJavaMigration {
      * @param audio   the audio check
      * @return the recitation, checked
      */
-    private static Recitation fromEveryAyah(String[] row, Map<String, JsonNode> folders, Map<String, Boolean> audio) {
+    static Recitation fromEveryAyah(String[] row, Map<String, JsonNode> folders, Map<String, Boolean> audio) {
         check(row[2].equals("EVERYAYAH"), "a provider MP3QURAN or EVERYAYAH (row " + row[0] + ")");
         check(!row[6].isBlank() && !row[7].isBlank(), "the label of EveryAyah row " + row[0]);
         Recitation r = new Recitation();
@@ -343,7 +343,7 @@ public class V1_3_1__ImportRecitations extends BaseJavaMigration {
      * @param en         mp3quran's riwayat in English
      * @throws SQLException if a row is refused
      */
-    private static void insertRiwayat(Connection connection, Set<Integer> ids, Map<Integer, JsonNode> ar,
+    static void insertRiwayat(Connection connection, Set<Integer> ids, Map<Integer, JsonNode> ar,
                                       Map<Integer, JsonNode> en) throws SQLException {
         String sql = "insert into riwayah (pk_id, name_ar, name_en, rawi_ar, qari_ar, matches_displayed_text) "
                 + "values (?, ?, ?, ?, ?, ?)";
@@ -400,7 +400,7 @@ public class V1_3_1__ImportRecitations extends BaseJavaMigration {
      * @throws SQLException if a row is refused
      * @throws IOException  if a timing file cannot be read
      */
-    private static void insertRecitations(Connection connection, List<Recitation> list, int[] ayahCounts,
+    static void insertRecitations(Connection connection, List<Recitation> list, int[] ayahCounts,
                                           Map<String, String> manifest, Set<String> exclusions)
             throws SQLException, IOException {
         Set<String> excludedSeen = new HashSet<>();
@@ -593,7 +593,7 @@ public class V1_3_1__ImportRecitations extends BaseJavaMigration {
      * @param array the array
      * @return id → entry
      */
-    private static Map<Integer, JsonNode> byId(JsonNode array) {
+    static Map<Integer, JsonNode> byId(JsonNode array) {
         Map<Integer, JsonNode> map = new HashMap<>();
         for (JsonNode n : array) {
             map.put(n.get("id").asInt(), n);
@@ -701,7 +701,7 @@ public class V1_3_1__ImportRecitations extends BaseJavaMigration {
      * @return its content
      * @throws IOException if it cannot be read
      */
-    private static String text(String path, String sha256) throws IOException {
+    static String text(String path, String sha256) throws IOException {
         return new String(V1_1_1__ImportQuranText.read(path, sha256), StandardCharsets.UTF_8);
     }
 
@@ -721,40 +721,40 @@ public class V1_3_1__ImportRecitations extends BaseJavaMigration {
     /**
      * A recitation being imported.
      */
-    private static final class Recitation {
+    static final class Recitation {
 
         /** Our id. */
-        private int id;
+        int id;
 
         /** Our reciter id. */
-        private int reciterId;
+        int reciterId;
 
         /** mp3quran's riwayah id. */
-        private int riwayahId;
+        int riwayahId;
 
         /** The style's name, or empty. */
-        private String style;
+        String style;
 
         /** The source's label in Arabic. */
-        private String nameAr;
+        String nameAr;
 
         /** The source's label in English. */
-        private String nameEn;
+        String nameEn;
 
         /** {@code MP3QURAN} or {@code EVERYAYAH}. */
-        private String provider;
+        String provider;
 
         /** mp3quran's moshaf id, or 0. */
-        private int moshafId;
+        int moshafId;
 
         /** Whether mp3quran's timings are imported for it. */
-        private boolean timed;
+        boolean timed;
 
         /** The surahs it holds, in order. */
-        private final List<Integer> surahs = new ArrayList<>();
+        final List<Integer> surahs = new ArrayList<>();
 
         /** Its sources, in order. */
-        private final List<Source> sources = new ArrayList<>();
+        final List<Source> sources = new ArrayList<>();
     }
 
     /**

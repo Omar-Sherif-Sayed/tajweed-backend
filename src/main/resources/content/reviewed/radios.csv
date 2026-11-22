@@ -1,0 +1,182 @@
+# The mp3quran radio channels and our decision for each (the author, 2026-11-22: recitation only — docs/plan/backend-plan.md §14.4).
+# decision: RECITER (one reciter) · RECITERS (several reciters) · LEFT_OUT (with the reason). reciter = mp3quran's reciter id when the
+# channel is one reciter of its catalogue (by the same name, or named here after checking). riwayah = mp3quran's riwayah id, only when
+# the channel names it. Every channel of radios-ar.json must have a row: a new channel stops the import until it is decided.
+mp3quran_id,decision,reciter,riwayah,reason
+1,RECITER,1,,same name as the catalogue
+2,RECITER,4,,same name as the catalogue
+3,RECITER,5,,named here after checking the catalogue
+4,RECITER,6,,same name as the catalogue
+5,RECITER,8,,same name as the catalogue
+6,RECITER,9,,same name as the catalogue
+7,RECITER,10,,same name as the catalogue
+8,RECITER,12,,same name as the catalogue
+9,RECITER,13,,same name as the catalogue
+10,RECITER,14,,same name as the catalogue
+11,RECITER,16,,same name as the catalogue
+12,RECITER,17,,same name as the catalogue
+13,RECITER,18,,same name as the catalogue
+14,RECITER,21,,same name as the catalogue
+15,RECITER,22,,same name as the catalogue
+16,RECITER,24,,same name as the catalogue
+17,RECITER,30,,same name as the catalogue
+18,RECITER,31,,same name as the catalogue
+19,RECITER,32,,same name as the catalogue
+20,RECITER,33,,same name as the catalogue
+21,RECITER,36,,same name as the catalogue
+22,RECITER,38,,same name as the catalogue
+23,RECITER,39,,same name as the catalogue
+24,RECITER,43,,same name as the catalogue
+25,RECITER,44,,same name as the catalogue
+26,RECITER,46,,same name as the catalogue
+27,RECITER,48,,same name as the catalogue
+28,RECITER,49,,same name as the catalogue
+29,RECITER,50,,same name as the catalogue
+30,RECITER,51,,same name as the catalogue
+31,RECITER,51,2,same name as the catalogue
+32,RECITER,51,,same name as the catalogue
+33,RECITER,54,,same name as the catalogue
+34,RECITER,55,,same name as the catalogue
+35,RECITER,59,,same name as the catalogue
+36,RECITER,60,,same name as the catalogue
+37,RECITER,61,,same name as the catalogue
+38,RECITER,62,,same name as the catalogue
+39,RECITER,64,3,same name as the catalogue
+40,RECITER,64,7,same name as the catalogue
+41,RECITER,66,,same name as the catalogue
+42,RECITER,67,,same name as the catalogue
+43,RECITER,69,,same name as the catalogue
+44,RECITER,70,,same name as the catalogue
+45,RECITER,71,,same name as the catalogue
+46,RECITER,74,,same name as the catalogue
+47,RECITER,74,5,named here after checking the catalogue
+48,RECITER,76,,same name as the catalogue
+49,RECITER,77,,same name as the catalogue
+50,RECITER,78,,same name as the catalogue
+51,RECITER,80,,same name as the catalogue
+52,RECITER,81,,same name as the catalogue
+53,RECITER,86,,same name as the catalogue
+54,RECITER,87,,same name as the catalogue
+55,RECITER,88,,same name as the catalogue
+56,RECITER,89,,same name as the catalogue
+57,RECITER,91,,same name as the catalogue
+58,RECITER,92,,same name as the catalogue
+59,RECITER,93,,same name as the catalogue
+60,RECITER,95,,same name as the catalogue
+61,RECITER,96,,same name as the catalogue
+62,RECITER,97,,same name as the catalogue
+63,RECITER,102,,same name as the catalogue
+64,RECITER,106,,same name as the catalogue
+65,RECITER,107,,same name as the catalogue
+66,RECITER,109,,same name as the catalogue
+67,RECITER,110,,same name as the catalogue
+68,RECITER,111,,same name as the catalogue
+69,RECITER,112,,same name as the catalogue
+70,RECITER,112,,same name as the catalogue
+71,RECITER,115,,same name as the catalogue
+72,RECITER,116,,same name as the catalogue
+73,RECITER,116,,same name as the catalogue
+74,RECITER,118,,same name as the catalogue
+75,RECITER,118,,same name as the catalogue
+76,RECITER,118,2,same name as the catalogue
+77,RECITER,121,,same name as the catalogue
+78,RECITER,121,,same name as the catalogue
+79,RECITER,123,,same name as the catalogue
+80,RECITER,125,,same name as the catalogue
+81,RECITER,126,,same name as the catalogue
+82,RECITER,127,,same name as the catalogue
+83,RECITER,129,,same name as the catalogue
+84,RECITER,149,,same name as the catalogue
+85,RECITER,151,,same name as the catalogue
+86,RECITER,159,,same name as the catalogue
+87,RECITER,160,,same name as the catalogue
+88,RECITER,161,,same name as the catalogue
+89,RECITER,163,,same name as the catalogue
+90,RECITER,165,,same name as the catalogue
+91,RECITER,178,,named here after checking the catalogue
+92,RECITER,129,,same name as the catalogue
+93,RECITER,181,,same name as the catalogue
+94,LEFT_OUT,,,the stream answered 404 on 2026-11-22 (eight tries) - to be added again when it works
+95,RECITER,193,,same name as the catalogue
+96,RECITER,129,,same name as the catalogue
+97,RECITER,197,,same name as the catalogue
+98,RECITER,198,,same name as the catalogue
+99,RECITER,201,,named here after checking the catalogue
+100,RECITER,201,,same name as the catalogue
+101,RECITER,202,,same name as the catalogue
+102,RECITER,203,,same name as the catalogue
+103,RECITER,206,,same name as the catalogue
+104,RECITER,208,,same name as the catalogue
+105,RECITER,115,,same name as the catalogue
+106,RECITER,211,,same name as the catalogue
+107,RECITER,212,,same name as the catalogue
+108,RECITERS,,,several reciters
+109,RECITERS,,,several reciters
+110,LEFT_OUT,,,programme (eid) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+111,RECITER,236,,same name as the catalogue
+113,LEFT_OUT,,,programme (fatwa) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+114,LEFT_OUT,,,programme (roqiah) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+115,RECITERS,,,Al-Baqarah by several reciters
+116,LEFT_OUT,,,programme (tafseer) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+117,RECITER,20,,same name as the catalogue
+118,RECITER,251,,same name as the catalogue
+119,RECITER,255,,same name as the catalogue
+120,RECITER,256,,same name as the catalogue
+121,RECITER,243,,same name as the catalogue
+122,RECITER,244,,same name as the catalogue
+123,RECITERS,,,several reciters
+139,RECITER,139,,same name as the catalogue
+217,RECITER,,,Bandar Balilah - not in mp3quran's reciter catalogue
+248,RECITER,248,,same name as the catalogue
+261,RECITER,109,,named here after checking the catalogue
+265,RECITER,265,,same name as the catalogue
+274,RECITER,274,,named here after checking the catalogue
+275,RECITER,275,,same name as the catalogue
+287,RECITER,287,,same name as the catalogue
+307,RECITER,307,,same name as the catalogue
+10902,RECITERS,,,ayat of tranquillity by several reciters
+10903,LEFT_OUT,,,programme (sahabah) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+10904,LEFT_OUT,,,programme (mukhtasartafsir) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+10906,LEFT_OUT,,,programme (athkar_sabah) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+10907,LEFT_OUT,,,programme (athkar_masa) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+21114,LEFT_OUT,,,programme (fi_zilal_alsiyra) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+21115,LEFT_OUT,,,programme (almukhtasar_fi_alsiyra) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+21116,LEFT_OUT,,,programme (alaikhtiarat_alfiqhayh_bin_baz) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+21117,LEFT_OUT,,,programme (tabri) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109038,RECITER,42,,same name as the catalogue
+109039,LEFT_OUT,,,translation of the meanings (translation_quran_urdu_basit) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109040,LEFT_OUT,,,translation of the meanings (translation_quran_spanish_afs) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109041,LEFT_OUT,,,translation of the meanings (translation_quran_albanian) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109042,LEFT_OUT,,,translation of the meanings (translation_quran_german) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109043,LEFT_OUT,,,translation of the meanings (translation_quran_tamazight) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109044,LEFT_OUT,,,translation of the meanings (translation_quran_urdu_sds_shur) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109045,LEFT_OUT,,,translation of the meanings (translation_quran_urdu_minsh) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109046,LEFT_OUT,,,translation of the meanings (translation_quran_english_basit) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109047,LEFT_OUT,,,translation of the meanings (translation_quran_english_bsfr) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109048,LEFT_OUT,,,translation of the meanings (translation_quran_english_walk_basit) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109049,LEFT_OUT,,,translation of the meanings (translation_quran_portuguese) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109050,LEFT_OUT,,,translation of the meanings (translation_quran_bosnia) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109051,LEFT_OUT,,,translation of the meanings (translation_quran_turkish) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109052,LEFT_OUT,,,translation of the meanings (translation_quran_Russia) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109053,LEFT_OUT,,,translation of the meanings (translation_quran_chinese) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109054,LEFT_OUT,,,translation of the meanings (translation_quran_farsi) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109055,LEFT_OUT,,,translation of the meanings (translation_quran_french) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109056,LEFT_OUT,,,translation of the meanings (translation_quran_kurdish) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109057,LEFT_OUT,,,translation of the meanings (translation_quran_Korean) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109058,LEFT_OUT,,,translation of the meanings (translation_quran_hungarian) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109059,LEFT_OUT,,,translation of the meanings (translation_quran_greek) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109060,RECITERS,,,Al-Mulk by several reciters
+109061,LEFT_OUT,,,programme (ramadan) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109062,LEFT_OUT,,,translation of the meanings (Translation_Quran_Hausa) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109066,LEFT_OUT,,,programme (saheh-muslim) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109067,LEFT_OUT,,,programme (saheh-bokharee) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109069,LEFT_OUT,,,programme (alanbiya) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109073,LEFT_OUT,,,programme (riyad) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109074,RECITER,58,,same name as the catalogue
+109075,RECITER,137,,same name as the catalogue
+109076,LEFT_OUT,,,programme (gareeb-quran) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109077,RECITER,254,,same name as the catalogue
+109078,RECITER,231,,same name as the catalogue
+109082,LEFT_OUT,,,national station - the broadcaster's own publication of this stream (stream.radiojar.com) is not verified yet (AGENTS.md §8.4)
+109083,LEFT_OUT,,,programme (shmaeel) - not recitation; each speaker and book to be checked first (AGENTS.md §6.10)
+109084,LEFT_OUT,,,the stream answered 404 on 2026-11-22 (eight tries) - to be added again when it works

@@ -53,7 +53,21 @@ class ReciterIntegrationTest {
         assertThat(count("select count(*) from recitation_surah s join recitation r on r.pk_id = s.recitation_id "
                 + "where r.mp3quran_moshaf_id = 112")).isEqualTo(114);
         assertThat(count("select count(*) from recitation where provider = 'MP3QURAN'")).isEqualTo(27);
-        assertThat(count("select count(*) from content_source")).isEqualTo(15);
+        assertThat(count("select count(*) from content_source")).isEqualTo(20);
+        assertThat(count("select count(*) from recitation")).isEqualTo(38);
+    }
+
+    @Test
+    @DisplayName("Recitation 38: EveryAyah's «Hudhaify», identified by the author as Ali al-Hudhaifi — Hafs, its own recitation")
+    void addsHudhaify() {
+        assertThat(count("select count(*) from recitation r join reciter c on c.pk_id = r.reciter_id "
+                + "where r.pk_id = 38 and c.mp3quran_id = 74 and r.provider = 'EVERYAYAH' and r.riwayah_id = 1")).isEqualTo(1);
+        assertThat(jdbcTemplate.queryForList("select url_template from audio_source where recitation_id = 38 "
+                + "order by priority", String.class)).containsExactly(
+                "https://everyayah.com/data/Hudhaify_128kbps/{surah}{ayah}.mp3",
+                "https://everyayah.com/data/Hudhaify_64kbps/{surah}{ayah}.mp3",
+                "https://everyayah.com/data/Hudhaify_32kbps/{surah}{ayah}.mp3");
+        assertThat(count("select count(*) from recitation_surah where recitation_id = 38")).isEqualTo(114);
     }
 
     @Test

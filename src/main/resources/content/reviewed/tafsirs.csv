@@ -1,0 +1,12 @@
+# The tafsirs the backend syncs from the Quran Foundation (Content Sync), in the order shown — the author,
+# 2026-11-22 (documentation repository, docs/plan/backend-plan.md §14.4): the six Arabic tafsirs of AGENTS.md §7.2 and
+# al-Wasit. A translated tafsir is added here only after its translator is named by a source we can cite (§6.10).
+# id = the Quran Foundation's resource id (api.quran.com/api/v4/resources/tafsirs, read 2026-11-22).
+id,sort_order,reason
+14,1,Tafsir Ibn Kathir (Arabic) - AGENTS.md §7.2
+15,2,Tafsir al-Tabari (Arabic) - AGENTS.md §7.2
+90,3,Tafsir al-Qurtubi (Arabic) - AGENTS.md §7.2
+94,4,Tafsir al-Baghawi (Arabic) - AGENTS.md §7.2
+91,5,Tafsir al-Sa'di (Arabic) - AGENTS.md §7.2
+16,6,Tafsir al-Muyassar (Arabic) - AGENTS.md §7.2
+93,7,al-Tafsir al-Wasit of Muhammad Sayyid Tantawi (Arabic) - the author 2026-11-22

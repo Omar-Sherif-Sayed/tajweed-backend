@@ -113,7 +113,53 @@ Rules:
    written permission). Otherwise streaming only, and the screen says so.
 7. **Credits**: show `credits` (mp3quran, and EveryAyah when one of its folders is a source) on the player.
 
-## 6. About (F15) and Sources (F17)
+## 6. Radio (F7)
+
+| Need | Call |
+| --- | --- |
+| The stations | `GET /v1/radios` — `stations` in order, `credits` (mp3quran) |
+| One station | `GET /v1/radios/{id}` |
+
+- Recitation only (the author, 2026-11-22): a station is one reciter (`RECITER`, with `reciterId` when he is in
+  `/v1/reciters`) or several (`RECITERS`). `riwayah` is given only when the channel names it; otherwise it is absent and
+  the screen does not guess one.
+- Play `streams` in `priority` order with the rules of §5 rule 5 (retry, next stream, without limit); a radio resumes at
+  the live point. `status: FAILING` = three failed daily checks — try it last, never drop it.
+- The stream is played directly from its address; never relayed through our server (`AGENTS.md` §8.4).
+
+## 7. Hadith — HadeethEnc (F13, F29, F35)
+
+| Need | Call |
+| --- | --- |
+| The categories (a tree: `parentId`) | `GET /v1/hadith-categories` |
+| The hadiths of a category and its sub-categories | `GET /v1/hadith-categories/{id}/hadiths?page=0&size=20` |
+| One hadith | `GET /v1/hadiths/{id}` |
+
+- A hadith is always given in Arabic (`arabic`); `translation` is the request's language when HadeethEnc publishes it,
+  otherwise absent — then the screen shows the Arabic with a note (`AGENTS.md` §6.10). Titles say their language
+  (`titleLanguage`).
+- **Show everything as received**: the text, `attribution`, `grade` (never apart from the hadith), `explanation`,
+  `hints`, `wordsMeanings`, `reference`. Nothing is shortened or reworded — their condition and ours.
+- **Credit on every hadith screen**: `credit.name` and a link to `sourceUrl` (the hadith's page on HadeethEnc) — their
+  condition of 2026-11-22.
+- The phones keep what they have read for offline use (their permission covers it); the content is never written into
+  a file of a repository.
+
+## 8. Tafsir (F5, F26)
+
+| Need | Call |
+| --- | --- |
+| The tafsirs, in order | `GET /v1/tafsirs` |
+| Every tafsir of an ayah ("read all its tafsirs" — F26) | `GET /v1/surahs/{n}/ayahs/{a}/tafsirs` |
+| One tafsir of an ayah | `GET /v1/tafsirs/{id}/surahs/{n}/ayahs/{a}` |
+
+- A text may cover several ayahs: `from` … `to` (`surah:ayah`). Show it once for the whole range, with the range.
+- `text` is HTML as the Quran Foundation sends it: render the markup, never edit the words.
+- Show `credit.name` («Quran data provided by Quran Foundation») and each tafsir's name — their terms.
+- The list is empty until the backend has synced (it needs the Quran Foundation's credentials); with the pre-live
+  credentials only surahs 1 – 2 have texts.
+
+## 9. About (F15) and Sources (F17)
 
 - `GET /v1/app-info` — the name in the request's language (Arabic or English), the author and his one link, the API
   version, the 22 languages.
@@ -121,7 +167,9 @@ Rules:
   Sources section. The fonts, the software libraries and the map are credited by each client from its own list.
 - The privacy statement waits for the public e-mail and postal address (`RT-04`).
 
-## 7. What is not in phase 1
+## 10. What is not here yet
 
-Prayer times and the Qibla are calculated on the device (no API); radio, tafsir, hadith and the rest come with their
-phases. A client never calls mp3quran's or EveryAyah's APIs itself — only their audio files, through `urlTemplate`.
+Prayer times and the Qibla are calculated on the device (no API); the default method of each country is in the
+documentation repository (`docs/data-sources/prayer-methods.md`, `P2-D1`). Adhkar, duas, Dorar's encyclopedias, the
+books and the Lives come with their phases. A client never calls mp3quran's, EveryAyah's, HadeethEnc's or the Quran
+Foundation's APIs itself — only the audio files and streams, through their addresses.

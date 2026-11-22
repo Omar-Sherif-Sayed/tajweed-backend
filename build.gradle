@@ -99,7 +99,7 @@ tasks.withType(Test).configureEach {
 // Unit tests: everything not tagged "integration" — no database, no Docker, no network.
 tasks.named('test') {
     useJUnitPlatform {
-        excludeTags 'integration'
+        excludeTags 'integration', 'live'
     }
 }
 
@@ -111,8 +111,25 @@ tasks.register('integrationTest', Test) {
     classpath = sourceSets.test.runtimeClasspath
     useJUnitPlatform {
         includeTags 'integration'
+        excludeTags 'live'
     }
     shouldRunAfter tasks.named('test')
+}
+
+// Live tests: tagged "live" — they call the real external APIs (the Quran Foundation with the author's credentials
+// from the environment, HadeethEnc), so they never run in CI or in a normal build. Docker must be running.
+//   QF_CLIENT_ID=… QF_CLIENT_SECRET=… QF_ENV=prelive ./gradlew liveTest
+tasks.register('liveTest', Test) {
+    description = 'Runs the tests tagged "live" against the real external APIs (credentials from the environment).'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'live'
+    }
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 // Coverage: a report only, no minimum (the author's convention) — build/reports/jacoco/test/html/index.html

@@ -4,7 +4,9 @@ Every file the backend imports content from, with its origin, licence and SHA-25
 `src/main/resources/content/` (so they ship inside the application and the import can read them), are **never edited**
 (`AGENTS.md` §6.1 of the documentation repository), and `.gitattributes` marks them `-text` so Git never changes a
 byte. The imports (`db.migration.V1_1_1__ImportQuranText`, `V1_2_1__ImportQuranSearchText`, `V1_3_1__ImportRecitations`) refuse any file whose checksum differs; the same
-checksums are recorded in the `content_source` table and served by `GET /v1/content-version`.
+checksums are recorded in the `content_source` table and served by `GET /v1/content-version`. Since 2026-11-22
+also `V1_3_2__AddHudhaifyRecitation` and `V1_4_1__ImportRadios`; and two sources are **not files at all** — they
+are fetched at run time (below).
 
 The product-wide register of every source (including those used only by the clients) is in the documentation
 repository: `docs/data-sources/` and `docs/permissions/README.md`.
@@ -39,8 +41,32 @@ another reciter's timings) give 15 – 23 %. Proven the same, and attached as a 
 al-Minshawi murattal (99 %), al-Husary murattal (100 / 98 %), Abdul Basit murattal (100 %), al-Tablawi murattal
 (100 %), al-Shuraim (95 / 94 %). Not the same recording, or not measurable (no timings), so kept as their own
 recitations: the other EveryAyah folders of the selection — with Saad al-Ghamdi's folder, named only «Ghamadi»,
-matched to him by 75 %. Left out: «Hudhaify» (named only so; Ali al-Hudhaifi's timings cannot be trusted, so the
-identity cannot be measured). The script and its results are in the session record of 2026-11-22.
+matched to him by 75 %. «Hudhaify» (named only so) could not be measured — Ali al-Hudhaifi's timings cannot be
+trusted — and was left out until **the author identified it on 2026-11-22 as Sheikh Ali al-Hudhaifi**: added then as
+its own recitation (38), never a fallback (1.3.2, below). The script and its results are in the session record of
+2026-11-22.
+
+### Added after the first import (1.3.2, 2026-11-22)
+
+| File | Bytes | SHA-256 | Origin | Licence | Checks |
+| --- | ---: | --- | --- | --- | --- |
+| `content/reviewed/recitations-added.csv` | 638 | `13afa3b27e9e42c66bc53de9cc23ed638a807fcea55730b081092d00635b9c77` | ours: recitation 38, EveryAyah's «Hudhaify» = Ali al-Hudhaifi (the author, 2026-11-22) | MIT (this project) | the same checks as 1.3.1: the folders in EveryAyah's list with their bitrate; the first and last ayah of every surah answered with audio (`audio-check.csv`); the reciter already in the catalogue |
+
+### The radio stations (1.4.1, 2026-11-22)
+
+| File | Bytes | SHA-256 | Origin | Licence | Checks |
+| --- | ---: | --- | --- | --- | --- |
+| `content/mp3quran/radios-ar.json` | 38,656 | `f99a1458914a30598a5304f1ad291b3e9c5b075889849f66bae8aedc0079487a` | `https://www.mp3quran.net/api/v3/radios?language=ar`, 2026-11-22 | mp3quran.net: «جميع الحقوق متاحة للجميع» | 177 channels, the same ids as the English list |
+| `content/mp3quran/radios-en.json` | 25,970 | `2d173b944963f3ebf45a764029857130ef7f290dcb09570365c65c400686f25a` | `…/radios?language=eng`, 2026-11-22 | the same | the same address for every channel |
+| `content/reviewed/radios.csv` | 12,379 | `7354848d69fe696662d26928b6674307552a74dfdc0589ec47f8648117dfcd7c` | ours: a decision for every channel — 127 of one reciter, 6 of several kept; 44 left out with the reason (programmes and translations: not recitation, speakers and books to be checked, §6.10; the Saudi Quran radio: the broadcaster's own publication of the stream not verified, §8.4; two streams that answered 404) | MIT (this project) | every channel decided, no decision without a channel |
+| `content/reviewed/radio-check.csv` | 3,427 | `e7e10d30acc6fd0ba465d5b4860423f091bcf003b0a41a29f7d3f9bbaf3768d1` | ours: every kept stream requested on 2026-11-22 (first 8 KB read; up to four tries, the failing ones up to eight — mp3quran's server answers `500` at times) | MIT (this project) | every kept channel answered `200 audio/mpeg` |
+
+### Fetched at run time — never a file here
+
+| Source | What | How | Terms |
+| --- | --- | --- | --- |
+| HadeethEnc — `hadeethenc.com/api/v1` (no key) | the encyclopedia's categories, hadiths, grades, explanations, benefits, word meanings, references and published translations, in our languages that it publishes (21 of 22 — not Korean) | `HadeethEncSync`: one request a second; refreshed every 30 days; an incomplete answer refused; the SHA-256 of every answer stored | **written permission of 2026-11-22** (no unsuitable advertisements, no change of meaning, HadeethEnc.com credited); the author's decision the same day: database only, never in a repository |
+| Quran Foundation — Content API | the tafsirs of `content/reviewed/tafsirs.csv` (849 bytes, SHA-256 `7f58f30dc596cc833729739e014de83abb3e54f439eb0469a21a9d514e7ff521`: Ibn Kathir, al-Tabari, al-Qurtubi, al-Baghawi, al-Sa'di, al-Muyassar, al-Wasit) | `TafsirSync`: Content Sync (`/resources/sync`, snapshots), every 6 days; credentials only from the environment | their Developer Terms: Content Sync is the only permitted way to keep a copy, synced at least every 7 days; never in a public repository; «Quran data provided by Quran Foundation» |
 
 ## How a new source file is added
 

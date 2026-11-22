@@ -8,7 +8,11 @@
 > mp3quran, 10 EveryAyah folders), each riwayah said plainly (non-Hafs = listening only), 8,926 audio files checked,
 > 74,977 ayah timings, a daily health check of the sources (ShedLock). 90 tests green. **2026-11-22: the phase 1 contract** — `docs/api/client-guide.md` — and
 > **the phones' Quran bundle** (`./gradlew quranBundle`, SQLite written by the import migrations themselves).
-> Next: the web scaffold (`P0-08`).
+> **2026-11-22 (the author: «ابدأ فيها», «اعمله»)**: recitation 38 — EveryAyah's «Hudhaify», identified by the author as
+> Ali al-Hudhaifi; **the `radio` module** (133 stations, recitation only, daily stream check); **the `hadith` module** —
+> HadeethEnc fetched into the database and refreshed (never in a file); **the `tafsir` module** — the Quran
+> Foundation's Content Sync, keys only from the environment; `content_sync`. 97 tests green. Next: the author's keys →
+> `./gradlew liveTest`; then the web scaffold (`P0-08`).
 
 ## Read first
 
@@ -62,8 +66,10 @@ every library, is `docs/plan/backend-plan.md` of the documentation repository.
 
 Added 2026-11-22 with its first use: **ShedLock 7.11.0** (`shedlock-spring`, `shedlock-provider-jdbc-template`; checked
 on Maven Central that day) for the daily health check of the audio sources. The check itself uses the JDK's
-`HttpClient` (one `HEAD` per source), and its test a local JDK `HttpServer` — no WireMock needed yet. Not yet added:
-WireMock and the HTTP interface clients (first external API called at run time — Quran Foundation, Dorar).
+`HttpClient` (one `HEAD` per source), and its test a local JDK `HttpServer` — no WireMock needed yet. 2026-11-22: the
+first HTTP interface client (`HadeethEncClient`, `@HttpExchange` on `RestClient`); the Quran Foundation's client uses the
+JDK `HttpClient` directly (its token and headers change per call). The tests of both use a local JDK `HttpServer` —
+still no WireMock and no new library.
 
 ## Structure
 
@@ -95,6 +101,13 @@ src/main/java/io/github/omarsherifsayed/tajweed/
                              GET /v1/reciters, /v1/reciters/{id}, /v1/recitations/{id}, …/surahs/{n}/timings
                              · scheduler/: AudioSourceHealthChecker (one HEAD per source), AudioSourceHealthScheduler
                              (daily, ShedLock), AudioHealthProperties (tajweed.audio-health.*)
+    radio/                   radio_station, radio_stream: GET /v1/radios, /v1/radios/{id} · scheduler/:
+                             RadioStreamHealthChecker (a GET, first 4 KB, up to three tries), daily with ShedLock
+    hadith/                  HadeethEnc: GET /v1/hadith-categories, …/{id}/hadiths, /v1/hadiths/{id} · client/
+                             (HTTP interface on RestClient) · scheduler/HadeethEncSync (one request a second, 30 days)
+    tafsir/                  GET /v1/tafsirs, /v1/surahs/{n}/ayahs/{a}/tafsirs · client/QuranFoundationClient (OAuth2
+                             client credentials, token cache) · scheduler/TafsirSync (Content Sync, 6 days)
+    source/                  … and content_sync (ContentSync: the state of every run-time sync), DtoCredit
 src/main/java/db/migration/  Java migrations that import content: V1_1_1__ImportQuranText (checksums, counts, insert),
                              V1_2_1__ImportQuranSearchText (the search text, same checks), V1_3_1__ImportRecitations
                              (the reciter catalogue: every choice checked against the sources, every timing file
@@ -153,6 +166,12 @@ src/test/java/…              mirrors main; ArchitectureTest; ApplicationIntegr
   for every source until its owner allows offline downloads in writing (F28).
 - **Run-time state is kept apart from content**: `audio_source_check` (written by the health check) is the one table
   the code writes; the content tables stay `@Immutable`.
+- **Content fetched at run time** (HadeethEnc, the Quran Foundation — parent `AGENTS.md` §5): a sync class in the
+  module's `scheduler/` writes it with `JdbcTemplate` (`insert … on conflict do update`, one row at a time), its state in
+  `content_sync`; the entities stay `@Immutable` for reading. **Nothing they send is ever written into a file of this
+  repository** — tests use a local `HttpServer` with placeholder texts marked «TEST ONLY». A broken or incomplete answer
+  is refused and the stored content kept. Credentials only from the environment, never logged; `./gradlew liveTest`
+  (tag `live`) is the only test that calls the real APIs, by hand, and prints counts only.
 - **The phones' Quran bundle** (`src/bundle`, `QuranBundleBuilder`): SQLite tables with the server's column names,
   filled by running `V1_1_1__ImportQuranText` and `V1_2_1__ImportQuranSearchText` on them, then checked against the
   Tanzil files line by line; reproducible (the audit dates are the newest source's date, not the clock). A change to
@@ -194,7 +213,22 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 | `AUDIO_HEALTH_ENABLED`, `AUDIO_HEALTH_CRON`, `AUDIO_HEALTH_TIMEOUT` | the daily `HEAD` check of every audio source (ShedLock: one instance) | `true`, `0 30 3 * * *` (UTC), `20s` |
 | `SERVER_FORWARDEDHEADERSSTRATEGY` | `native` behind a reverse proxy (the client's address for the rate limit) | `none` |
 | `SWAGGER_UI_ENABLED`, `API_DOCS_ENABLED` | the Swagger page and the OpenAPI document | `true` |
-| (later) `DORAR_API_KEY`, `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_ENV` | external APIs — never in a file | — |
+| `HADEETHENC_SYNC_ENABLED`, `HADEETHENC_SYNC_CRON`, `HADEETHENC_SYNC_DELAY`, `HADEETHENC_REFRESH_AFTER`, `HADEETHENC_BASE_URL` | HadeethEnc's sync | `true`, `0 0 2 * * *`, `1s`, `30d`, their API |
+| `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_ENV` | the Quran Foundation's keys — never in a file (`docs/setup/quran-foundation-keys.md`) | —, —, `prelive` |
+| `QF_SYNC_ENABLED`, `QF_SYNC_CRON`, `QF_REFRESH_AFTER`, `QF_AUTH_URL`, `QF_API_URL` | the tafsir sync; the two addresses only for tests | `true`, `0 30 2 * * *`, `6d`, their environment's |
+| (later) `DORAR_API_KEY` | Dorar — never in a file | — |
+
+## Verified on 2026-11-22 (radio, hadith, tafsir)
+
+- `./gradlew build jacocoTestReport integrationTest`: 97 tests, 0 failures — 133 radio stations, Abdul Basit's Warsh
+  channel with «ورش عن نافع» and his reciter id, no programme; recitation 38 with its three Hudhaify folders and 114
+  surahs; the HadeethEnc sync against a local server (categories, titles, texts as received, an answer without a grade
+  refused, Arabic fallback); the tafsir sync against a local server (HTTP Basic token, `x-auth-token` and `x-client-id`,
+  bootstrap over two pages, snapshot, row update, a range 1:2 – 1:4 answering for 1:3, the next run from `sync_token`
+  with a deletion); the radio check (audio bytes yes; HTML, empty, `500`, closed port no).
+- Data checked: 177 mp3quran channels decided; every kept stream answered `200 audio/mpeg` on 2026-11-22 (two that
+  answered `404` after eight tries left out).
+- Not yet run: `./gradlew liveTest` against the Quran Foundation — waiting for the author's keys.
 
 ## Verified on 2026-11-22 (the bundle)
 

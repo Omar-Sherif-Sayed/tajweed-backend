@@ -1,0 +1,52 @@
+# The Quran Foundation's keys — how to keep them on your computer (2026-11-22)
+
+The tafsir module (F5, F26) syncs the tafsirs from the Quran Foundation. It needs the app's **client id** and **client
+secret** from their Developer Console. They must never be written in a file of any repository (all five are public),
+never in a chat, never in an e-mail. The backend reads them only from three environment variables:
+
+| Variable | Value |
+| --- | --- |
+| `QF_CLIENT_ID` | the client id of the environment you use |
+| `QF_CLIENT_SECRET` | the secret of the same environment |
+| `QF_ENV` | `prelive` first (it has surahs 1 – 2 only), `production` after their approval |
+
+## On this Windows computer — once
+
+1. Open **PowerShell** yourself (Start → PowerShell). Not the agent's chat.
+2. Run these three lines, one at a time. The first two **ask** for the value: paste it at the prompt and press Enter.
+   The value is not written in PowerShell's history (only the command is).
+
+   ```powershell
+   $v = Read-Host 'Quran Foundation client id (pre-live)'; [Environment]::SetEnvironmentVariable('QF_CLIENT_ID', $v, 'User'); Remove-Variable v
+   ```
+
+   ```powershell
+   $v = Read-Host 'Quran Foundation client secret (pre-live)'; [Environment]::SetEnvironmentVariable('QF_CLIENT_SECRET', $v, 'User'); Remove-Variable v
+   ```
+
+   ```powershell
+   [Environment]::SetEnvironmentVariable('QF_ENV', 'prelive', 'User')
+   ```
+
+3. **Close and reopen the Claude app** (and any terminal): programs read the environment when they start.
+4. Tell the agent «المفاتيح جاهزة». The agent then runs `./gradlew liveTest`, which syncs the tafsirs from pre-live into
+   a temporary test database and prints **only counts** (how many rows, how many tafsirs cover 1:1) — never the id, the
+   secret, a token or a text.
+
+⚠ Honest limit: a user environment variable can be read by any program you run under your account — the agent
+included. The agent's rule is never to print, log, copy or commit them; the backend never logs them either (its
+errors name the address called, without the query, and never a header).
+
+## Later
+
+- **Production**: when the Quran Foundation approves the app for production, set the production id and secret the
+  same way and `QF_ENV` to `production`.
+- **The server**: on the production server the same three variables are set in the service's environment (or its
+  secret store) — `docs/deployment/` when hosting is chosen (`RT-01`).
+- **If a secret leaks**: rotate it at once in their Developer Console (their terms also ask that a breach be reported
+  to developers@quran.com within 24 hours), then set the new value as above.
+- **To remove them** from this computer:
+
+  ```powershell
+  'QF_CLIENT_ID','QF_CLIENT_SECRET','QF_ENV' | ForEach-Object { [Environment]::SetEnvironmentVariable($_, $null, 'User') }
+  ```

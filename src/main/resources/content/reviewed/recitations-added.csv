@@ -1,0 +1,4 @@
+# Recitations added after the first import (V1_3_2), with the same columns as recitations.csv.
+# 2026-11-22: the author identified EveryAyah's «Hudhaify» as Sheikh Ali al-Hudhaifi (mp3quran reciter 74).
+id,reciter_mp3quran_id,provider,key,riwayah_id,style,name_ar,name_en,everyayah_failover,evidence
+38,74,EVERYAYAH,Hudhaify_128kbps;Hudhaify_64kbps;Hudhaify_32kbps,1,,حفص عن عاصم (ملف لكل آية),Hudhaify (EveryAyah - one file per ayah),,EveryAyah folder named only Hudhaify - identified as Sheikh Ali al-Hudhaifi by the author (2026-11-22); not measurable against mp3quran (its timings fail the ayah count): kept apart

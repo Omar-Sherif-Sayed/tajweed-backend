@@ -21,6 +21,9 @@ The whole product — its rules, decisions, design and plan — is described in 
 | `GET /v1/reciters` · `GET /v1/reciters/{id}` | the reciters, each with his recitations: the riwayah said plainly (its name, rawi and qari; *listening only* when it is not Hafs, the riwayah of the displayed text), the style, how many surahs, whether ayah timings exist |
 | `GET /v1/recitations/{id}` | one recitation: the surahs it holds, its audio sources in the order a player tries them (with their daily health check), its credits |
 | `GET /v1/recitations/{id}/surahs/{surah}/timings` | when each ayah starts and ends in the surah file (mp3quran's timings, checked against the Tanzil ayah count) |
+| `GET /v1/radios` · `GET /v1/radios/{id}` | Quran radio stations — recitation only: 127 channels of one reciter and 6 of several, from mp3quran; the riwayah where the channel names it; streams with their daily health check |
+| `GET /v1/hadith-categories` · `GET /v1/hadith-categories/{id}/hadiths` · `GET /v1/hadiths/{id}` | HadeethEnc's encyclopedia (with their permission): categories, hadiths with grade, explanation, benefits, word meanings and references, in Arabic and in the published translation of the request's language — fetched into the database and refreshed every 30 days |
+| `GET /v1/tafsirs` · `GET /v1/surahs/{n}/ayahs/{a}/tafsirs` · `GET /v1/tafsirs/{id}/surahs/{n}/ayahs/{a}` | the tafsirs (Ibn Kathir, al-Tabari, al-Qurtubi, al-Baghawi, al-Sa'di, al-Muyassar, al-Wasit) — synced from the Quran Foundation every 6 days when its keys are set |
 | `GET /v1/content-version` | a fingerprint of the content's sources — the apps refresh their copies when it changes |
 | `GET /actuator/health` | `UP` when the application and its database are working |
 | `GET /swagger-ui.html` · `GET /v3/api-docs` | the API's documentation and its OpenAPI contract |
@@ -73,6 +76,7 @@ On the author's Windows machine two settings are needed first — see `AGENTS.md
 | --- | --- |
 | `./gradlew build` | compiling, the unit tests (no database), the Javadoc checks, the architecture rules |
 | `./gradlew integrationTest` | the tests on a real PostgreSQL 18 in Docker; it also rewrites `docs/api/openapi.yaml` |
+| `./gradlew liveTest` | by hand only: the real Quran Foundation (keys from the environment — [`docs/setup/quran-foundation-keys.md`](docs/setup/quran-foundation-keys.md)) and HadeethEnc; prints counts only |
 | `./gradlew jacocoTestReport` | the coverage report: `build/reports/jacoco/test/html/index.html` |
 
 Every class, method and field carries a Javadoc comment; the build fails when one is missing.
@@ -88,6 +92,9 @@ variables. The settings:
 | `CORS_ORIGINS` | the web application's addresses, comma-separated | `http://localhost:4200` |
 | `RATE_LIMIT_PER_MINUTE` | requests one client may send each minute | `120` |
 | `AUDIO_HEALTH_ENABLED`, `AUDIO_HEALTH_CRON`, `AUDIO_HEALTH_TIMEOUT` | the daily check of the audio sources: on or off, when (Spring cron, UTC), how long one request may take | `true`, `0 30 3 * * *`, `20s` |
+| `HADEETHENC_SYNC_ENABLED`, `HADEETHENC_SYNC_CRON`, `HADEETHENC_SYNC_DELAY`, `HADEETHENC_REFRESH_AFTER` | HadeethEnc's sync: on or off, the daily look, the pause between requests, the refresh age | `true`, `0 0 2 * * *`, `1s`, `30d` |
+| `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_ENV` | the Quran Foundation's keys (never in a file) and `prelive` / `production`; without the keys the tafsirs stay empty | —, —, `prelive` |
+| `QF_SYNC_ENABLED`, `QF_SYNC_CRON`, `QF_REFRESH_AFTER` | the tafsir sync: on or off, the daily look, the refresh age (their limit is 7 days) | `true`, `0 30 2 * * *`, `6d` |
 | `SERVER_FORWARDEDHEADERSSTRATEGY` | `native` when the API runs behind a reverse proxy | `none` |
 | `SWAGGER_UI_ENABLED`, `API_DOCS_ENABLED` | the documentation page and the OpenAPI document | `true` |
 
