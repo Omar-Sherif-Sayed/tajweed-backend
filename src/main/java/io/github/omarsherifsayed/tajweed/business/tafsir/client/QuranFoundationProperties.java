@@ -19,12 +19,15 @@ import org.springframework.validation.annotation.Validated;
  * @param timeout      how long one request may take
  * @param authUrl      the token service; empty means the one of {@code env}
  * @param apiUrl       the Content API, up to {@code /content}; empty means the one of {@code env}
+ * @param onlyTafsirs  for the live test only: these resource ids instead of {@code content/reviewed/tafsirs.csv} —
+ *                     pre-live does not offer the chosen tafsirs, so the mechanism is checked on one it offers
  */
 @Validated
 @ConfigurationProperties(prefix = "tajweed.quran-foundation")
 public record QuranFoundationProperties(boolean enabled, String clientId, String clientSecret, @NotBlank String env,
                                         @NotBlank String cron, @NotNull Duration refreshAfter,
-                                        @NotNull Duration timeout, String authUrl, String apiUrl) {
+                                        @NotNull Duration timeout, String authUrl, String apiUrl,
+                                        java.util.List<Integer> onlyTafsirs) {
 
     /**
      * Whether the credentials are set.

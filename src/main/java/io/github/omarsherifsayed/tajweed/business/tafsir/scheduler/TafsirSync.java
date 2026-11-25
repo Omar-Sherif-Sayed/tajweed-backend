@@ -122,8 +122,17 @@ public class TafsirSync {
         state = contentSyncRepository.save(state);
         int[] written = {0};
         try {
-            Map<Integer, Integer> chosen = chosen();
-            syncNames(chosen);
+            Map<Integer, Integer> chosen = choice();
+            List<Integer> missing = new ArrayList<>(chosen.keySet());
+            chosen = syncNames(chosen);
+            missing.removeAll(chosen.keySet());
+            if (chosen.isEmpty()) {
+                state.succeed(0, state.getSyncToken(), clock.instant());
+                state.note("none of the chosen tafsirs is offered here: " + missing);
+                contentSyncRepository.save(state);
+                log.warn("Tafsir sync: none of the chosen tafsirs {} is offered by this environment", missing);
+                return 0;
+            }
             String token;
             try {
                 token = syncChanges(chosen, state.getSyncToken(), written);
@@ -135,6 +144,10 @@ public class TafsirSync {
                 token = syncChanges(chosen, null, written);
             }
             state.succeed(written[0], token, clock.instant());
+            if (!missing.isEmpty()) {
+                state.note("not offered here: " + missing);
+                log.warn("Tafsir sync: {} not offered by this environment", missing);
+            }
             log.info("Tafsir sync finished: {} rows written", written[0]);
         } catch (RuntimeException e) {
             state.fail(written[0], e.getMessage(), clock.instant());
@@ -145,16 +158,38 @@ public class TafsirSync {
     }
 
     /**
-     * The tafsirs' names, for the chosen ones, from the list in English and in Arabic.
+     * The tafsirs to sync: {@code content/reviewed/tafsirs.csv}, or — for the live test only — {@code only-tafsirs}.
+     *
+     * @return resource id → place in the list
+     */
+    private Map<Integer, Integer> choice() {
+        if (properties.onlyTafsirs() == null || properties.onlyTafsirs().isEmpty()) {
+            return chosen();
+        }
+        Map<Integer, Integer> map = new LinkedHashMap<>();
+        for (Integer id : properties.onlyTafsirs()) {
+            map.put(id, map.size() + 1);
+        }
+        return map;
+    }
+
+    /**
+     * The tafsirs' names, for the chosen ones the environment offers, from its list in English and in Arabic. A chosen
+     * tafsir it does not offer is skipped (pre-live offers only a few), and the caller records which.
      *
      * @param chosen resource id → place in the list
+     * @return the chosen tafsirs it offers, in the same order
      */
-    private void syncNames(Map<Integer, Integer> chosen) {
+    private Map<Integer, Integer> syncNames(Map<Integer, Integer> chosen) {
+        Map<Integer, Integer> offered = new LinkedHashMap<>();
         Map<Integer, JsonNode> english = byId(client.get("/api/v4/resources/tafsirs?language=en").path("tafsirs"));
         Map<Integer, JsonNode> arabic = byId(client.get("/api/v4/resources/tafsirs?language=ar").path("tafsirs"));
         for (Map.Entry<Integer, Integer> c : chosen.entrySet()) {
             JsonNode en = english.get(c.getKey());
-            check(en != null, "tafsir " + c.getKey() + " in the Quran Foundation's list");
+            if (en == null) {
+                continue;
+            }
+            offered.put(c.getKey(), c.getValue());
             JsonNode ar = arabic.get(c.getKey());
             jdbc.update("insert into tafsir (pk_id, provider, name_ar, name_en, author_ar, author_en, language, sort_order) "
                     + "values (?, 'QURAN_FOUNDATION', ?, ?, ?, ?, ?, ?) on conflict (pk_id) do update set "
@@ -165,6 +200,10 @@ public class TafsirSync {
                     en.path("name").asString(), ar == null ? null : ar.path("author_name").asString(null),
                     en.path("author_name").asString(null), en.path("language_name").asString(""), c.getValue());
         }
+        if (offered.isEmpty()) {
+            log.info("the environment offers the tafsirs {}", new java.util.TreeSet<>(english.keySet()));
+        }
+        return offered;
     }
 
     /**

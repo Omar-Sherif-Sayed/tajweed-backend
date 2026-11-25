@@ -23,6 +23,7 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @Tag("live")
 @SpringBootTest(properties = {"tajweed.hadeethenc.enabled=false", "tajweed.quran-foundation.enabled=false",
+        "tajweed.quran-foundation.only-tafsirs=${QF_LIVE_TAFSIRS:}",
         "tajweed.audio-health.enabled=false"})
 @Import(TestcontainersConfiguration.class)
 class LiveSourcesTest {

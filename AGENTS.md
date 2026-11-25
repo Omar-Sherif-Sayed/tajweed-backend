@@ -216,6 +216,7 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 | `HADEETHENC_SYNC_ENABLED`, `HADEETHENC_SYNC_CRON`, `HADEETHENC_SYNC_DELAY`, `HADEETHENC_REFRESH_AFTER`, `HADEETHENC_BASE_URL` | HadeethEnc's sync | `true`, `0 0 2 * * *`, `1s`, `30d`, their API |
 | `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_ENV` | the Quran Foundation's keys — never in a file (`docs/setup/quran-foundation-keys.md`) | —, —, `prelive` |
 | `QF_SYNC_ENABLED`, `QF_SYNC_CRON`, `QF_REFRESH_AFTER`, `QF_AUTH_URL`, `QF_API_URL` | the tafsir sync; the two addresses only for tests | `true`, `0 30 2 * * *`, `6d`, their environment's |
+| `QF_LIVE_TAFSIRS` | `liveTest` only: tafsir ids to sync instead of the chosen list (pre-live offers none of ours — use `169`) | — |
 | (later) `DORAR_API_KEY` | Dorar — never in a file | — |
 
 ## Verified on 2026-11-22 (radio, hadith, tafsir)
@@ -228,7 +229,12 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
   with a deletion); the radio check (audio bytes yes; HTML, empty, `500`, closed port no).
 - Data checked: 177 mp3quran channels decided; every kept stream answered `200 audio/mpeg` on 2026-11-22 (two that
   answered `404` after eight tries left out).
-- Not yet run: `./gradlew liveTest` against the Quran Foundation — waiting for the author's keys.
+- **2026-11-26, `./gradlew liveTest` with the author's pre-live keys**: token obtained; Content Sync bootstrap and
+  snapshot in the shape the sync reads; **pre-live offers only the tafsirs 159, 169, 170, 381, 804, 926 — none of our
+  seven Arabic ones** (they are in the public Quran.com list, so expected in production). The sync now skips a chosen
+  tafsir its environment does not offer and records which (`content_sync.message`); the live test checks the mechanism
+  on tafsir 169 (`QF_LIVE_TAFSIRS=169`, a throwaway test database only): 293 rows = the 7 + 286 ayahs of surahs 1 – 2,
+  1:1 covered. HadeethEnc: 72 languages, 493 categories, hadith 2962 with its grade.
 
 ## Verified on 2026-11-22 (the bundle)
 

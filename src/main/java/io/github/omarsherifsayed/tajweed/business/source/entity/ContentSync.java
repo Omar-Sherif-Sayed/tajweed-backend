@@ -122,6 +122,15 @@ public class ContentSync extends AbstractAuditingEntity {
     }
 
     /**
+     * Records a note about a finished run (for example, chosen items the provider does not offer).
+     *
+     * @param note what to record, in a few words
+     */
+    public void note(String note) {
+        message = note == null ? null : note.substring(0, Math.min(note.length(), MESSAGE_LENGTH));
+    }
+
+    /**
      * Forgets the cursor, so the next run starts from the beginning.
      */
     public void forgetToken() {

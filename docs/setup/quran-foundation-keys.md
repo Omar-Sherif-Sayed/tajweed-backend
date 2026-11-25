@@ -37,6 +37,20 @@ never in a chat, never in an e-mail. The backend reads them only from three envi
 included. The agent's rule is never to print, log, copy or commit them; the backend never logs them either (its
 errors name the address called, without the query, and never a header).
 
+## The first live check (2026-11-26)
+
+The keys work. Pre-live offers only the tafsirs 159, 169, 170, 381, 804 and 926 — **none of the seven Arabic tafsirs
+we chose**, so on pre-live the sync records «none of the chosen tafsirs is offered here» and writes nothing. To check
+the mechanism there, the live test syncs tafsir 169 into its throwaway database:
+
+```powershell
+$env:QF_LIVE_TAFSIRS = '169'; .\gradlew.bat liveTest
+```
+
+Result: 293 rows (al-Fatihah and al-Baqarah, one per ayah), 1:1 covered. The chosen tafsirs come with **production**:
+ask the Quran Foundation to approve the app for production with the tafsir scope (`content.tafsirs.read`) and the sync
+scope (`content.sync.read`), then set the production keys and `QF_ENV=production`.
+
 ## Later
 
 - **Production**: when the Quran Foundation approves the app for production, set the production id and secret the
