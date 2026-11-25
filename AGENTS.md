@@ -235,6 +235,11 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
   tafsir its environment does not offer and records which (`content_sync.message`); the live test checks the mechanism
   on tafsir 169 (`QF_LIVE_TAFSIRS=169`, a throwaway test database only): 293 rows = the 7 + 286 ayahs of surahs 1 – 2,
   1:1 covered. HadeethEnc: 72 languages, 493 categories, hadith 2962 with its grade.
+- **2026-11-26, the same with the author's production keys**: the token granted with both scopes; all seven chosen
+  tafsirs offered; the first run answered `422` «Duplicate resource group: tafsirs» — the filter must name a group once
+  with its ids together (`tafsirs:14,15,…`, now so), and the client's errors now carry the API's own message. Second
+  run: **42,623 rows, 7 tafsirs, all 7 covering 1:1**, status OK (fewer than 7 × 6,236: a text may cover several
+  ayahs).
 
 ## Verified on 2026-11-22 (the bundle)
 

@@ -215,9 +215,10 @@ public class TafsirSync {
      * @return the token to store
      */
     private String syncChanges(Map<Integer, Integer> chosen, String token, int[] written) {
-        StringBuilder filter = new StringBuilder();
+        // one entry per resource group, its ids together (the API refuses "Duplicate resource group: tafsirs")
+        StringBuilder filter = new StringBuilder("tafsirs:");
         for (Integer id : chosen.keySet()) {
-            filter.append(filter.isEmpty() ? "" : "%3B").append("tafsirs:").append(id);
+            filter.append(filter.length() == "tafsirs:".length() ? "" : "%2C").append(id);
         }
         String next = "/api/v4/resources/sync?per_page=100&resources=" + filter
                 + (token == null ? "&bootstrap=true" : "&sync_token=" + token);

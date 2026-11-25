@@ -79,13 +79,16 @@ public class QuranFoundationClient {
         }
         if (response.statusCode() != 200) {
             String type = "";
+            String detail = "";
             try {
                 JsonNode error = json.readTree(response.body());
                 type = error.path("type").asString(error.path("error").asString(""));
+                detail = error.path("message").asString(error.path("error_description").asString(""));
             } catch (RuntimeException ignored) {
                 // not JSON — the status says enough
             }
-            throw new QuranFoundationException(response.statusCode(), type, url.replaceAll("\\?.*", ""));
+            throw new QuranFoundationException(response.statusCode(), type,
+                    url.replaceAll("\\?.*", "") + (detail.isBlank() ? "" : " — " + detail));
         }
         return json.readTree(response.body());
     }

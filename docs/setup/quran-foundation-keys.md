@@ -54,6 +54,12 @@ scopes the sync uses — `content.tafsirs.read` (the tafsirs) and `content.sync.
 way to keep a copy). Pre-live has both: its token was granted with them. Ask only for what is missing, then set the
 production keys and `QF_ENV=production`.
 
+## Production (2026-11-26)
+
+The author set the production keys (`QF_ENV=production`). The token was granted with both scopes, so nothing had to be
+requested. `./gradlew liveTest`: the seven chosen tafsirs synced — 42,623 rows, each of the seven with a text for 1:1.
+The pre-live keys were replaced by the production ones; they are still in the author's console if pre-live is needed.
+
 ## Later
 
 - **Production**: when the Quran Foundation approves the app for production, set the production id and secret the
