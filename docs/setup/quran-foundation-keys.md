@@ -47,9 +47,12 @@ the mechanism there, the live test syncs tafsir 169 into its throwaway database:
 $env:QF_LIVE_TAFSIRS = '169'; .\gradlew.bat liveTest
 ```
 
-Result: 293 rows (al-Fatihah and al-Baqarah, one per ayah), 1:1 covered. The chosen tafsirs come with **production**:
-ask the Quran Foundation to approve the app for production with the tafsir scope (`content.tafsirs.read`) and the sync
-scope (`content.sync.read`), then set the production keys and `QF_ENV=production`.
+Result: 293 rows (al-Fatihah and al-Baqarah, one per ayah), 1:1 covered. The chosen tafsirs come with the Quran Foundation's
+**production** environment — their data, not the release of our app. Not needed now (the author, 2026-11-26); when the
+tafsir screens are built or before release: look in their console whether the production client already has the two
+scopes the sync uses — `content.tafsirs.read` (the tafsirs) and `content.sync.read` (Content Sync, their only permitted
+way to keep a copy). Pre-live has both: its token was granted with them. Ask only for what is missing, then set the
+production keys and `QF_ENV=production`.
 
 ## Later
 
