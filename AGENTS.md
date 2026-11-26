@@ -208,7 +208,7 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 | Variable | Meaning | Default |
 | --- | --- | --- |
 | `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | the production database | local: from `compose.yaml` |
-| `CORS_ORIGINS` | the web application's origins, comma-separated | `http://localhost:4200` |
+| `CORS_ORIGINS` | the web application's origins, comma-separated | `http://localhost:4200,http://localhost:4201` (the web on this computer) |
 | `RATE_LIMIT_PER_MINUTE` | requests per client per minute on `/v1/**` | `120` |
 | `AUDIO_HEALTH_ENABLED`, `AUDIO_HEALTH_CRON`, `AUDIO_HEALTH_TIMEOUT` | the daily `HEAD` check of every audio source (ShedLock: one instance) | `true`, `0 30 3 * * *` (UTC), `20s` |
 | `SERVER_FORWARDEDHEADERSSTRATEGY` | `native` behind a reverse proxy (the client's address for the rate limit) | `none` |

@@ -89,7 +89,7 @@ variables. The settings:
 | Variable | Meaning | Default |
 | --- | --- | --- |
 | `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | the database | — (required) |
-| `CORS_ORIGINS` | the web application's addresses, comma-separated | `http://localhost:4200` |
+| `CORS_ORIGINS` | the web application's addresses, comma-separated | `http://localhost:4200,http://localhost:4201` (the web on this computer) |
 | `RATE_LIMIT_PER_MINUTE` | requests one client may send each minute | `120` |
 | `AUDIO_HEALTH_ENABLED`, `AUDIO_HEALTH_CRON`, `AUDIO_HEALTH_TIMEOUT` | the daily check of the audio sources: on or off, when (Spring cron, UTC), how long one request may take | `true`, `0 30 3 * * *`, `20s` |
 | `HADEETHENC_SYNC_ENABLED`, `HADEETHENC_SYNC_CRON`, `HADEETHENC_SYNC_DELAY`, `HADEETHENC_REFRESH_AFTER` | HadeethEnc's sync: on or off, the daily look, the pause between requests, the refresh age | `true`, `0 0 2 * * *`, `1s`, `30d` |
