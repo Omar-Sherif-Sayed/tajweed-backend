@@ -12,10 +12,12 @@ import java.util.List;
  * @param page          the page, 1 to 604
  * @param ayahs         the ayahs on it — all of them start on it — in order
  * @param lines         its lines, top to bottom (15; 8 on pages 1 and 2)
+ * @param rubAyahIds    the ayahs on it before which the printed copy draws ۞: the first ayah of a hizb quarter, except
+ *                      where the quarter starts at an ayah 1 (the quarter at 15:49 as printed)
  * @param textSource    where the text comes from
  * @param layoutSource  where the line breaks come from
  */
 @Schema(description = "A page of the Madinah mushaf: its ayahs, its lines as printed (1405H), and their sources.")
-public record DtoPage(int page, List<DtoAyah> ayahs, List<DtoMushafLine> lines,
+public record DtoPage(int page, List<DtoAyah> ayahs, List<DtoMushafLine> lines, List<Integer> rubAyahIds,
         DtoContentSource textSource, DtoContentSource layoutSource) {
 }

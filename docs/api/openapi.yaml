@@ -1744,6 +1744,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DtoMushafLine"
+        rubAyahIds:
+          type: array
+          items:
+            type: integer
+            format: int32
         textSource:
           $ref: "#/components/schemas/DtoContentSource"
         layoutSource:

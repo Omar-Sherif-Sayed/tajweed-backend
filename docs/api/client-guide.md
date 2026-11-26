@@ -68,8 +68,8 @@ Rules:
   `BASMALA` (the client draws the first ayah's own first four words) or `TEXT`: the words from `firstWord` of
   `firstAyahId` to `lastWord` of `lastAyahId`, both included — the ayahs' `text` split at single spaces, counted from 0
   (the basmala's words in front of an ayah 1 are never on a text line). Draw each word exactly as received, the ayah's
-  number after its last word, and ۞ before the first ayah of each hizb quarter (where `hizbQuarter` changes) except at
-  an ayah 1 — the printed rule. The line breaks come from the DigitalKhatt old-Madinah layout (MIT, **`layoutSource`**,
+  number after its last word, and ۞ before each ayah listed in `rubAyahIds` (the first ayah of a hizb quarter, except
+  at an ayah 1 — the printed rule; 15:49 as printed). The line breaks come from the DigitalKhatt old-Madinah layout (MIT, **`layoutSource`**,
   credited with the text's source); only positions are stored, the text is always Tanzil's. Each line is justified to
   the page's width; with a font other than the King Fahd page fonts the letters differ from the print, the words and
   the lines do not.

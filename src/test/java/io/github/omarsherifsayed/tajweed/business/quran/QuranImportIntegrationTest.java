@@ -114,7 +114,14 @@ class QuranImportIntegrationTest {
                 .andExpect(jsonPath("$.data.lines[7].kind").value("BASMALA"))
                 .andExpect(jsonPath("$.data.lines[8].firstWord").value(4))
                 .andExpect(jsonPath("$.data.layoutSource.code").value("DIGITALKHATT_OLD_MADINAH_LAYOUT"))
-                .andExpect(jsonPath("$.data.layoutSource.licence").value("MIT"));
+                .andExpect(jsonPath("$.data.layoutSource.licence").value("MIT"))
+                .andExpect(jsonPath("$.data.rubAyahIds.length()").value(0));
+        // Page 264 has the quarter sign before 15:49, as the author's printed copy (Tanzil's metadata says 15:50).
+        Integer ayah1549 = jdbcTemplate.queryForObject(
+                "select pk_id from ayah where surah_id = 15 and number_in_surah = 49", Integer.class);
+        mockMvc.perform(get("/v1/pages/264"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.rubAyahIds[0]").value(ayah1549));
     }
 
     @Test

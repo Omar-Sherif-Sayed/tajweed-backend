@@ -1,5 +1,6 @@
 package io.github.omarsherifsayed.tajweed.business.quran.service.impl;
 
+import io.github.omarsherifsayed.tajweed.business.quran.entity.Ayah;
 import io.github.omarsherifsayed.tajweed.business.quran.entity.MushafLine;
 import io.github.omarsherifsayed.tajweed.business.quran.mapper.QuranMapper;
 import io.github.omarsherifsayed.tajweed.business.quran.repository.AyahRepository;
@@ -7,6 +8,7 @@ import io.github.omarsherifsayed.tajweed.business.quran.repository.MushafLineRep
 import io.github.omarsherifsayed.tajweed.business.quran.schema.response.DtoPage;
 import io.github.omarsherifsayed.tajweed.business.quran.service.PageRetrievalService;
 import io.github.omarsherifsayed.tajweed.business.source.service.ContentSourceRetrievalService;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,9 +40,20 @@ public class PageRetrievalServiceImpl implements PageRetrievalService {
     @Override
     public DtoPage getPage(int page) {
         List<MushafLine> lines = mushafLineRepository.findByPageOrderByLineAsc((short) page);
+        List<Ayah> ayahs = ayahRepository.findByPageOrderByIdAsc((short) page);
+        List<Integer> rubAyahIds = new ArrayList<>();
+        for (int i = 0; i < ayahs.size(); i++) {
+            Ayah ayah = ayahs.get(i);
+            Short before = i > 0 ? ayahs.get(i - 1).getHizbQuarter()
+                    : ayahRepository.findById(ayah.getId() - 1).map(Ayah::getHizbQuarter).orElse(null);
+            if (ayah.getNumberInSurah() != 1 && before != null && !before.equals(ayah.getHizbQuarter())) {
+                rubAyahIds.add(ayah.getId());
+            }
+        }
         return new DtoPage(page,
-                ayahRepository.findByPageOrderByIdAsc((short) page).stream().map(QuranMapper::toDto).toList(),
+                ayahs.stream().map(QuranMapper::toDto).toList(),
                 lines.stream().map(QuranMapper::toDto).toList(),
+                rubAyahIds,
                 contentSourceRetrievalService.getSource(ContentSourceRetrievalService.QURAN_TEXT),
                 contentSourceRetrievalService.getSource(ContentSourceRetrievalService.MUSHAF_LAYOUT));
     }
