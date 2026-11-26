@@ -4,6 +4,10 @@
 services:
   postgres:
     image: 'postgres:18'
+    # A fixed name, so the container is easy to find in Docker Desktop and `docker` commands (the author, 2026-11-26).
+    container_name: 'tajweed-postgres'
+    # Started again after a crash or a Docker restart, unless it was stopped on purpose (the author, 2026-11-26).
+    restart: 'unless-stopped'
     environment:
       - 'POSTGRES_DB=tajweed'
       - 'POSTGRES_USER=tajweed'
