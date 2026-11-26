@@ -756,7 +756,8 @@ paths:
     get:
       tags:
       - Quran
-      summary: The ayahs that start on a page of the Madinah mushaf (1 – 604)
+      summary: "A page of the Madinah mushaf (1 – 604): its ayahs and its lines as\
+        \ printed (1405H)"
       operationId: getPage
       parameters:
       - name: page
@@ -1698,10 +1699,39 @@ components:
           type: string
         data:
           $ref: "#/components/schemas/DtoPage"
+    DtoMushafLine:
+      type: object
+      description: "A line of the printed mushaf: a surah header, the basmala, or\
+        \ a run of the ayahs' words."
+      properties:
+        line:
+          type: integer
+          format: int32
+        kind:
+          type: string
+          enum:
+          - SURAH_HEADER
+          - BASMALA
+          - TEXT
+        surahNumber:
+          type: integer
+          format: int32
+        firstAyahId:
+          type: integer
+          format: int32
+        firstWord:
+          type: integer
+          format: int32
+        lastAyahId:
+          type: integer
+          format: int32
+        lastWord:
+          type: integer
+          format: int32
     DtoPage:
       type: object
-      description: "The ayahs that start on a page of the Madinah mushaf, and the\
-        \ source of the text."
+      description: "A page of the Madinah mushaf: its ayahs, its lines as printed\
+        \ (1405H), and their sources."
       properties:
         page:
           type: integer
@@ -1710,7 +1740,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DtoAyah"
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoMushafLine"
         textSource:
+          $ref: "#/components/schemas/DtoContentSource"
+        layoutSource:
           $ref: "#/components/schemas/DtoContentSource"
     BaseResponseListDtoJuz:
       type: object

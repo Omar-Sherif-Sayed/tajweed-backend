@@ -53,7 +53,7 @@ class ReciterIntegrationTest {
         assertThat(count("select count(*) from recitation_surah s join recitation r on r.pk_id = s.recitation_id "
                 + "where r.mp3quran_moshaf_id = 112")).isEqualTo(114);
         assertThat(count("select count(*) from recitation where provider = 'MP3QURAN'")).isEqualTo(27);
-        assertThat(count("select count(*) from content_source")).isEqualTo(20);
+        assertThat(count("select count(*) from content_source")).isEqualTo(21);
         assertThat(count("select count(*) from recitation")).isEqualTo(38);
     }
 

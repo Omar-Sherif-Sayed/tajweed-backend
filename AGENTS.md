@@ -12,7 +12,10 @@
 > Ali al-Hudhaifi; **the `radio` module** (133 stations, recitation only, daily stream check); **the `hadith` module** —
 > HadeethEnc fetched into the database and refreshed (never in a file); **the `tafsir` module** — the Quran
 > Foundation's Content Sync, keys only from the environment; `content_sync`. 97 tests green. Next: the author's keys →
-> `./gradlew liveTest`; then the web scaffold (`P0-08`).
+> `./gradlew liveTest`; then the web scaffold (`P0-08`). **2026-11-26 (the author approved the table): the printed
+> mushaf's lines** — `mushaf_line` (1.7.0 / 1.7.1): the 604 pages of the 1405H mushaf line by line, as positions in
+> the Tanzil text (the line breaks from the DigitalKhatt layout, MIT; every Tanzil word matched and placed once), in
+> `/v1/pages/{page}` (`lines`, `layoutSource`).
 
 ## Read first
 
@@ -94,7 +97,8 @@ src/main/java/io/github/omarsherifsayed/tajweed/
     appinfo/                 GET /v1/app-info — controller · service (+ impl) · schema/response (Dto*) · mapper
     source/                  content_source: GET /v1/content-version (entity, repository, service, mapper)
     quran/                   surah, ayah: GET /v1/surahs, /v1/surahs/{n}/ayahs, /v1/surahs/{n}/ayahs/{a},
-                             /v1/pages/{page}, /v1/juzs (entity, enums, repository + projections, services, mapper)
+                             /v1/pages/{page} (its ayahs and its printed lines — mushaf_line), /v1/juzs (entity,
+                             enums, repository + projections, services, mapper)
                              · GET /v1/quran-search — search/: ArabicSearchNormalizer (the one tidying function),
                              QuranSearchIndex (in memory, built on the first search), SurahNameMatcher (names, references)
     reciter/                 riwayah, reciter, recitation, recitation_surah, audio_source, ayah_timing:

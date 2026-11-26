@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * {@code /v1/pages/{page}} — the ayahs that start on a page of the Madinah mushaf (1 – 604; outside it answers
- * {@code 400 INVALID_REQUEST}).
+ * {@code /v1/pages/{page}} — a page of the Madinah mushaf (1 – 604; outside it answers {@code 400 INVALID_REQUEST}):
+ * its ayahs and its lines as printed (1405H).
  */
 @Tag(name = "Quran")
 @RestController
@@ -36,13 +36,13 @@ public class PageRetrievalController {
     private final MessageService messages;
 
     /**
-     * The ayahs that start on a page.
+     * A page: its ayahs and its printed lines.
      *
      * @param page   the page, 1 to 604
      * @param locale the request's language (for the message)
-     * @return {@code 200} with the ayahs and the source of the text
+     * @return {@code 200} with the ayahs, the lines and their sources
      */
-    @Operation(summary = "The ayahs that start on a page of the Madinah mushaf (1 – 604)")
+    @Operation(summary = "A page of the Madinah mushaf (1 – 604): its ayahs and its lines as printed (1405H)")
     @GetMapping(path = "/{page}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BaseResponse<DtoPage>> getPage(@PathVariable @Min(1) @Max(604) int page, Locale locale) {
         return ResponseEntity.ok()

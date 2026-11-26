@@ -15,7 +15,7 @@ The whole product — its rules, decisions, design and plan — is described in 
 | `GET /v1/surahs` | the 114 surahs: Arabic and transliterated names, Makki / Madani, order of revelation, ayahs, first page |
 | `GET /v1/surahs/{surah}/ayahs` | a surah and all its ayahs — the text exactly as Tanzil writes it — and the text's source |
 | `GET /v1/surahs/{surah}/ayahs/{ayah}` | one ayah with its page, juz, hizb, quarter and sajdah |
-| `GET /v1/pages/{page}` | the ayahs that start on a page of the Madinah mushaf (1 – 604) |
+| `GET /v1/pages/{page}` | a page of the Madinah mushaf (1 – 604): its ayahs and its 15 lines as printed (1405H) |
 | `GET /v1/juzs` | where each of the 30 juz starts |
 | `GET /v1/quran-search?q=…` | one search box: words with or without tashkeel (the ayahs that contain them, with the words to highlight, page by page), a surah name (Arabic or Latin), or a reference (`2:255`, «البقرة 255») |
 | `GET /v1/reciters` · `GET /v1/reciters/{id}` | the reciters, each with his recitations: the riwayah said plainly (its name, rawi and qari; *listening only* when it is not Hafs, the riwayah of the displayed text), the style, how many surahs, whether ayah timings exist |

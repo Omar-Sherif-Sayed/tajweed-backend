@@ -50,7 +50,7 @@ Error codes (a client shows `message`, or its own text for the code — codes ne
 | --- | --- |
 | The index of the mushaf (114 surahs: names, Makki / Madani, order of revelation, ayahs, first page) | `GET /v1/surahs` |
 | The 30 juz with their first ayah and page | `GET /v1/juzs` |
-| A page of the Madinah mushaf (1 – 604) | `GET /v1/pages/{page}` — the ayahs that **start** on it |
+| A page of the Madinah mushaf (1 – 604) | `GET /v1/pages/{page}` — its ayahs (every page begins with a new ayah, so they all start on it) and its **lines as printed** (1405H) |
 | A surah, or one ayah | `GET /v1/surahs/{n}/ayahs` · `GET /v1/surahs/{n}/ayahs/{a}` |
 
 Rules:
@@ -63,7 +63,16 @@ Rules:
 - `hizb` is derived from `hizbQuarter` (four quarters a hizb). The quarter at 15:49 follows the printed copy (Tanzil
   says 15:50) — already applied.
 - Every Quran screen shows **`textSource`** (Tanzil's name and link): Tanzil's licence requires it.
-- ⚠ The exact line breaks of the printed page are not in this API: they come from the layout data (DigitalKhatt, `P0-12`).
+- **The printed page** (since 1.7.0, 2026-11-26): `lines` gives the page's 15 lines (8 on pages 1 and 2), top to
+  bottom, each `SURAH_HEADER` (its `surahNumber`; the client adds «ترتيبها» and «آياتها» as the printed copy does),
+  `BASMALA` (the client draws the first ayah's own first four words) or `TEXT`: the words from `firstWord` of
+  `firstAyahId` to `lastWord` of `lastAyahId`, both included — the ayahs' `text` split at single spaces, counted from 0
+  (the basmala's words in front of an ayah 1 are never on a text line). Draw each word exactly as received, the ayah's
+  number after its last word, and ۞ before the first ayah of each hizb quarter (where `hizbQuarter` changes) except at
+  an ayah 1 — the printed rule. The line breaks come from the DigitalKhatt old-Madinah layout (MIT, **`layoutSource`**,
+  credited with the text's source); only positions are stored, the text is always Tanzil's. Each line is justified to
+  the page's width; with a font other than the King Fahd page fonts the letters differ from the print, the words and
+  the lines do not.
 
 ## 4. Search (F16)
 

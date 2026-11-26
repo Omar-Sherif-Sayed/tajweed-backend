@@ -5,13 +5,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
- * The ayahs that start on a page of the Madinah mushaf. The lines of the page (where each line breaks) are not part
- * of this answer: the apps draw the page with the mushaf layout they ship ({@code P0-12}).
+ * A page of the Madinah mushaf: its ayahs and its lines as printed (1405H) — everything a client needs to draw the
+ * page as the printed copy. Every page of this mushaf begins with a new ayah (the import checks it), so the ayahs
+ * that start on the page are all the ayahs on it.
  *
- * @param page       the page, 1 to 604
- * @param ayahs      the ayahs that start on it, in order
- * @param textSource where the text comes from
+ * @param page          the page, 1 to 604
+ * @param ayahs         the ayahs on it — all of them start on it — in order
+ * @param lines         its lines, top to bottom (15; 8 on pages 1 and 2)
+ * @param textSource    where the text comes from
+ * @param layoutSource  where the line breaks come from
  */
-@Schema(description = "The ayahs that start on a page of the Madinah mushaf, and the source of the text.")
-public record DtoPage(int page, List<DtoAyah> ayahs, DtoContentSource textSource) {
+@Schema(description = "A page of the Madinah mushaf: its ayahs, its lines as printed (1405H), and their sources.")
+public record DtoPage(int page, List<DtoAyah> ayahs, List<DtoMushafLine> lines,
+        DtoContentSource textSource, DtoContentSource layoutSource) {
 }

@@ -1,10 +1,12 @@
 package io.github.omarsherifsayed.tajweed.business.quran.mapper;
 
 import io.github.omarsherifsayed.tajweed.business.quran.entity.Ayah;
+import io.github.omarsherifsayed.tajweed.business.quran.entity.MushafLine;
 import io.github.omarsherifsayed.tajweed.business.quran.entity.Surah;
 import io.github.omarsherifsayed.tajweed.business.quran.repository.JuzStartProjection;
 import io.github.omarsherifsayed.tajweed.business.quran.schema.response.DtoAyah;
 import io.github.omarsherifsayed.tajweed.business.quran.schema.response.DtoJuz;
+import io.github.omarsherifsayed.tajweed.business.quran.schema.response.DtoMushafLine;
 import io.github.omarsherifsayed.tajweed.business.quran.schema.response.DtoSurah;
 
 /**
@@ -45,6 +47,19 @@ public final class QuranMapper {
         return new DtoAyah(ayah.getId(), ayah.getSurahId(), ayah.getNumberInSurah(), ayah.getTextUthmani(),
                 ayah.getBasmalaWordCount(), ayah.getPage(), ayah.getJuz(), (quarter - 1) / QUARTERS_PER_HIZB + 1,
                 quarter, ayah.getSajdahType());
+    }
+
+    /**
+     * A line of the printed mushaf as the clients see it.
+     *
+     * @param line the database row
+     * @return the response object
+     */
+    public static DtoMushafLine toDto(MushafLine line) {
+        return new DtoMushafLine(line.getLine(), line.getKind(),
+                line.getSurahNumber() == null ? null : line.getSurahNumber().intValue(), line.getFirstAyahId(),
+                line.getFirstWord() == null ? null : line.getFirstWord().intValue(), line.getLastAyahId(),
+                line.getLastWord() == null ? null : line.getLastWord().intValue());
     }
 
     /**

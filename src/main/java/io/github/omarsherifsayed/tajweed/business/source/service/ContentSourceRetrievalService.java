@@ -11,6 +11,9 @@ public interface ContentSourceRetrievalService {
     /** The code of the Quran text's source (Tanzil Uthmani), credited beside every Quran answer. */
     String QURAN_TEXT = "TANZIL_UTHMANI";
 
+    /** The code of the source of the printed mushaf's line breaks (DigitalKhatt, old Madinah 1405H). */
+    String MUSHAF_LAYOUT = "DIGITALKHATT_OLD_MADINAH_LAYOUT";
+
     /**
      * The content's version and its sources.
      *

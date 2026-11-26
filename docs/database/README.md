@@ -21,6 +21,8 @@ a simple edit of these migrations.
 | 1.2.1 | `db/migration/V1_2_1__ImportQuranSearchText.java` | imports Tanzil «Simple» and «Simple (Clean)» after verifying both SHA-256 and that both have the 6,236 ayahs in the order of `ayah`; records the two files in `content_source` |
 | 1.3.0 | `V1_3_0__create_reciter_tables.sql` | the reciter module's tables, `audio_source_check` and `shedlock` |
 | 1.3.1 | `db/migration/V1_3_1__ImportRecitations.java` | imports the reciter catalogue and the timings after verifying every file's SHA-256, every choice of the selection against the sources, every audio file's check and every timing file's ayah count |
+| 1.7.0 | `V1_7_0__create_mushaf_line_table.sql` | the table `mushaf_line` (2026-11-26, approved by the author) |
+| 1.7.1 | `db/migration/V1_7_1__ImportMushafLines.java` | imports the printed page's lines after verifying the DigitalKhatt layout's SHA-256 and matching every line to the Tanzil words (the checks: `docs/data-sources/README.md`) |
 
 ## `content_source` — every file the content comes from (module `source`)
 
@@ -251,6 +253,25 @@ Changes from the proposal (`docs/plan/backend-plan.md` §14.2 of the documentati
 
 Change from the proposal: `source_record_id` added (a row change or deletion names the record), and `ayah_to` became
 `ayah_to_id` (a foreign key like `ayah_id`).
+
+## `mushaf_line` — the lines of the printed mushaf (module `quran`, F2, since 1.7.0)
+
+The printed Madinah mushaf of 1405H, line by line: 9,046 rows — 604 pages of 15 lines (8 on pages 1 and 2). Only
+positions are stored; the text is always `ayah.text_uthmani` (`AGENTS.md` §6.1). Approved by the author on 2026-11-26.
+
+| Column | Type | Value |
+| --- | --- | --- |
+| `pk_id` | serial | the row |
+| `page` | smallint, 1 – 604 | the page |
+| `line` | smallint, 1 – 15 | the line; `uk_mushaf_line_page_line` (page, line) |
+| `kind` | varchar(12): `SURAH_HEADER` / `BASMALA` / `TEXT` | what the line holds |
+| `surah_number` | smallint → `surah` | a header's or a basmala's surah; null on a text line |
+| `first_ayah_id`, `first_word` | integer → `ayah`, smallint ≥ 0 | a text line's first word: the index, from 0, of the ayah text's space-separated words |
+| `last_ayah_id`, `last_word` | likewise | its last word — the pause marks and the sajdah sign written after it belong to the line |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+`ck_mushaf_line_shape`: a text line has its four positions and no surah; a header or a basmala has its surah and no
+positions. The basmala's four words in front of an ayah 1 are never on a text line (the `BASMALA` line draws them).
 
 ## Planned (not created yet)
 

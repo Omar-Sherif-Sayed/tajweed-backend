@@ -81,6 +81,43 @@ class QuranImportIntegrationTest {
     }
 
     @Test
+    @DisplayName("The printed mushaf's lines: 604 pages of 15 lines (8 on pages 1 and 2), 114 headers, 112 basmalas")
+    void storesThePrintedLines() {
+        assertThat(count("select count(*) from mushaf_line")).isEqualTo(9046);
+        assertThat(count("select count(distinct page) from mushaf_line")).isEqualTo(604);
+        assertThat(count("select count(*) from (select page from mushaf_line group by page having count(*) <> "
+                + "case when page <= 2 then 8 else 15 end) x")).isZero();
+        assertThat(count("select count(*) from mushaf_line where kind = 'SURAH_HEADER'")).isEqualTo(114);
+        assertThat(count("select count(*) from mushaf_line where kind = 'BASMALA'")).isEqualTo(112);
+        // The last line of the Quran ends on the last word of 114:6.
+        assertThat(jdbcTemplate.queryForObject("select a.surah_id || ':' || a.number_in_surah || ':' || l.last_word "
+                + "from mushaf_line l join ayah a on a.pk_id = l.last_ayah_id where l.page = 604 and l.line = 15",
+                String.class)).isEqualTo("114:6:2");
+        assertThat(count("select count(*) from content_source where code = 'DIGITALKHATT_OLD_MADINAH_LAYOUT'"))
+                .isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("GET /v1/pages/545 gives the 15 lines of the author's photographed page: 58:22, then al-Hashr")
+    void servesThePrintedPage() throws Exception {
+        Integer ayah5822 = jdbcTemplate.queryForObject(
+                "select pk_id from ayah where surah_id = 58 and number_in_surah = 22", Integer.class);
+        mockMvc.perform(get("/v1/pages/545"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.lines.length()").value(15))
+                .andExpect(jsonPath("$.data.lines[0].kind").value("TEXT"))
+                .andExpect(jsonPath("$.data.lines[0].firstAyahId").value(ayah5822))
+                .andExpect(jsonPath("$.data.lines[0].firstWord").value(0))
+                .andExpect(jsonPath("$.data.lines[0].lastWord").value(8))
+                .andExpect(jsonPath("$.data.lines[6].kind").value("SURAH_HEADER"))
+                .andExpect(jsonPath("$.data.lines[6].surahNumber").value(59))
+                .andExpect(jsonPath("$.data.lines[7].kind").value("BASMALA"))
+                .andExpect(jsonPath("$.data.lines[8].firstWord").value(4))
+                .andExpect(jsonPath("$.data.layoutSource.code").value("DIGITALKHATT_OLD_MADINAH_LAYOUT"))
+                .andExpect(jsonPath("$.data.layoutSource.licence").value("MIT"));
+    }
+
+    @Test
     @DisplayName("Quarter 106 starts at 15:49, as the printed mushaf has it (Tanzil's metadata says 15:50)")
     void appliesTheReviewedQuarterCorrection() {
         String first = jdbcTemplate.queryForObject(
@@ -157,12 +194,12 @@ class QuranImportIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /v1/content-version gives a 16-digit fingerprint and every source (20)")
+    @DisplayName("GET /v1/content-version gives a 16-digit fingerprint and every source (21)")
     void servesTheContentVersion() throws Exception {
         mockMvc.perform(get("/v1/content-version"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.version").value(org.hamcrest.Matchers.matchesPattern("[0-9a-f]{16}")))
-                .andExpect(jsonPath("$.data.sources.length()").value(20))
+                .andExpect(jsonPath("$.data.sources.length()").value(21))
                 .andExpect(jsonPath("$.data.sources[4].sha256")
                         .value("1862ee63c70fbfc6285e0bb0b9587b89beb5b7891109a4d543d9d2cf8283e8c8"))
                 .andExpect(jsonPath("$.data.sources[0].sha256")
