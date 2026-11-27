@@ -23,6 +23,7 @@ a simple edit of these migrations.
 | 1.3.1 | `db/migration/V1_3_1__ImportRecitations.java` | imports the reciter catalogue and the timings after verifying every file's SHA-256, every choice of the selection against the sources, every audio file's check and every timing file's ayah count |
 | 1.7.0 | `V1_7_0__create_mushaf_line_table.sql` | the table `mushaf_line` (2026-11-26, approved by the author) |
 | 1.7.1 | `db/migration/V1_7_1__ImportMushafLines.java` | imports the printed page's lines after verifying the DigitalKhatt layout's SHA-256 and matching every line to the Tanzil words (the checks: `docs/data-sources/README.md`) |
+| 1.8.0 | `V1_8_0__create_qf_mushaf_word_table.sql` | the table `qf_mushaf_word` (2026-11-27, approved by the author); no migration fills it — the running backend does, through the Quran Foundation's Content Sync |
 
 ## `content_source` — every file the content comes from (module `source`)
 
@@ -272,6 +273,32 @@ positions are stored; the text is always `ayah.text_uthmani` (`AGENTS.md` §6.1)
 
 `ck_mushaf_line_shape`: a text line has its four positions and no surah; a header or a basmala has its surah and no
 positions. The basmala's four words in front of an ayah 1 are never on a text line (the `BASMALA` line draws them).
+
+## `qf_mushaf_word` — the King Fahd QCF V1 glyphs (module `quran`, F2, since 1.8.0)
+
+The words of the Quran Foundation's mushaf 2 — «QCF V1, King Fahd Complex Mushaf 1405 hijri print» — each as the
+glyph of its page's QCF V1 font: 83,665 rows (77,429 words and 6,236 ayah numbers, the first real snapshot,
+2026-11-27). Filled only by `QfMushafSync` from their Content Sync (`mushafs:2`; their terms: the only permitted
+offline copy, synced at least every 7 days, never in a repository). A glyph only draws the text: what is copied and
+searched is always `ayah.text_uthmani` (`AGENTS.md` §6.1). Approved by the author on 2026-11-27.
+
+| Column | Type | Value |
+| --- | --- | --- |
+| `pk_id` | serial | the row |
+| `mushaf_id` | smallint | their mushaf id (2) |
+| `qf_word_id` | integer | their record's id — the key of their row changes; `uk_qf_mushaf_word` (mushaf_id, qf_word_id) |
+| `ayah_id` | smallint → `ayah` | the ayah (their verse ids are ours, 1 – 6236 in order — checked) |
+| `position` | smallint ≥ 1 | the order on the page (their `position_in_page`; their `position_in_line` has gaps and repeats, so it is not used) |
+| `char_type` | varchar(4): `word` / `end` | a word, or the ayah's number |
+| `page`, `line` | smallint, 1 – 604, 1 – 15 | where it stands — also the font that draws it (`p{page}`) |
+| `glyph` | varchar(8) | the glyph's characters in the page's font, as received |
+| `synced_at` | timestamptz | when it was synced |
+| `created_at`, `updated_at` | timestamptz | audit |
+
+The sync stores a snapshot only when it agrees with `mushaf_line`: 604 pages, one number for every ayah, every line
+of theirs a text line of ours holding the same ayahs — the one difference allowed is an ayah's number opening the
+next line (566 lines, as the King Fahd print sets them; never the next page). Index `ix_qf_mushaf_word_page`
+(mushaf_id, page, position).
 
 ## Planned (not created yet)
 

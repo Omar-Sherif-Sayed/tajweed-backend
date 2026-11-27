@@ -1753,6 +1753,45 @@ components:
           $ref: "#/components/schemas/DtoContentSource"
         layoutSource:
           $ref: "#/components/schemas/DtoContentSource"
+        qcf:
+          $ref: "#/components/schemas/DtoQcfPage"
+    DtoQcfGlyph:
+      type: object
+      description: "A word, or an ayah's number, as a glyph of the page's font."
+      properties:
+        glyph:
+          type: string
+        ayahId:
+          type: integer
+          format: int32
+        end:
+          type: boolean
+    DtoQcfLine:
+      type: object
+      description: A text line of the page in QCF V1 glyphs.
+      properties:
+        line:
+          type: integer
+          format: int32
+        glyphs:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoQcfGlyph"
+    DtoQcfPage:
+      type: object
+      description: "A page's glyphs in the King Fahd QCF V1 fonts, from the Quran\
+        \ Foundation."
+      properties:
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/DtoQcfLine"
+        basmala:
+          type: string
+        credit:
+          type: string
+        creditUrl:
+          type: string
     BaseResponseListDtoJuz:
       type: object
       description: "The envelope of every answer: success flag, code, message in the\

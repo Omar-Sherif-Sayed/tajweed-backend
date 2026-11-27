@@ -73,6 +73,16 @@ Rules:
   credited with the text's source); only positions are stored, the text is always Tanzil's. Each line is justified to
   the page's width; with a font other than the King Fahd page fonts the letters differ from the print, the words and
   the lines do not.
+- **The King Fahd letter shapes** (since 1.8.0, 2026-11-27): `qcf` gives the page in the QCF V1 fonts of the Quran
+  Foundation's mushaf 2 (the 1405H print) — `lines` (the text lines only: `line` and `glyphs`, each `glyph`,
+  `ayahId`, `end` for an ayah's number), `basmala` (the glyphs of 1:1 without its number), `credit` and `creditUrl`.
+  Draw every glyph of a page in that page's font `p{page}`, the basmala in the page-1 font, a surah's name with the
+  surah-names font (the text `surah` followed by the number in three digits, e.g. `surah059`); words separated by
+  one space. An ayah's number may open the next line, as printed. The fonts are bundled with the client (their
+  terms: while our account is active, credited «Quran fonts provided by Quran Foundation» — show `credit` with the
+  pages and in Sources — never offered on their own); a client draws a page in glyphs only once its font has
+  loaded, and otherwise the Tanzil text as above. What is copied, shared and searched is always `text`. `qcf` is
+  `null` until the backend has synced the mushaf.
 
 ## 4. Search (F16)
 

@@ -94,7 +94,8 @@ variables. The settings:
 | `AUDIO_HEALTH_ENABLED`, `AUDIO_HEALTH_CRON`, `AUDIO_HEALTH_TIMEOUT` | the daily check of the audio sources: on or off, when (Spring cron, UTC), how long one request may take | `true`, `0 30 3 * * *`, `20s` |
 | `HADEETHENC_SYNC_ENABLED`, `HADEETHENC_SYNC_CRON`, `HADEETHENC_SYNC_DELAY`, `HADEETHENC_REFRESH_AFTER` | HadeethEnc's sync: on or off, the daily look, the pause between requests, the refresh age | `true`, `0 0 2 * * *`, `1s`, `30d` |
 | `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_ENV` | the Quran Foundation's keys (never in a file) and `prelive` / `production`; without the keys the tafsirs stay empty | —, —, `prelive` |
-| `QF_SYNC_ENABLED`, `QF_SYNC_CRON`, `QF_REFRESH_AFTER` | the tafsir sync: on or off, the daily look, the refresh age (their limit is 7 days) | `true`, `0 30 2 * * *`, `6d` |
+| `QF_SYNC_ENABLED`, `QF_SYNC_CRON`, `QF_REFRESH_AFTER` | the tafsir and mushaf syncs: on or off, the daily look, the refresh age (their limit is 7 days) | `true`, `0 30 2 * * *`, `6d` |
+| `QF_SYNC_ON_START` | run the due Quran Foundation syncs once the server has started (a new database) | `false` |
 | `SERVER_FORWARDEDHEADERSSTRATEGY` | `native` when the API runs behind a reverse proxy | `none` |
 | `SWAGGER_UI_ENABLED`, `API_DOCS_ENABLED` | the documentation page and the OpenAPI document | `true` |
 

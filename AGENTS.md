@@ -15,7 +15,11 @@
 > `./gradlew liveTest`; then the web scaffold (`P0-08`). **2026-11-26 (the author approved the table): the printed
 > mushaf's lines** — `mushaf_line` (1.7.0 / 1.7.1): the 604 pages of the 1405H mushaf line by line, as positions in
 > the Tanzil text (the line breaks from the DigitalKhatt layout, MIT; every Tanzil word matched and placed once), in
-> `/v1/pages/{page}` (`lines`, `layoutSource`).
+> `/v1/pages/{page}` (`lines`, `layoutSource`). **2026-11-27 (the author approved the table): the King Fahd letter
+> shapes** — `qf_mushaf_word` (1.8.0), filled by `QfMushafSync` from the Quran Foundation's Content Sync
+> (`mushafs:2`, QCF V1 = the 1405H print), checked against `mushaf_line` before it is stored; `/v1/pages/{page}`
+> gives `qcf` (glyphs by line, the basmala, the credit). `QF_SYNC_ON_START=true` runs the due syncs when the
+> application starts (a new database).
 
 ## Read first
 
@@ -219,7 +223,8 @@ Commit `docs/api/openapi.yaml` whenever `integrationTest` changes it — CI fail
 | `SWAGGER_UI_ENABLED`, `API_DOCS_ENABLED` | the Swagger page and the OpenAPI document | `true` |
 | `HADEETHENC_SYNC_ENABLED`, `HADEETHENC_SYNC_CRON`, `HADEETHENC_SYNC_DELAY`, `HADEETHENC_REFRESH_AFTER`, `HADEETHENC_BASE_URL` | HadeethEnc's sync | `true`, `0 0 2 * * *`, `1s`, `30d`, their API |
 | `QF_CLIENT_ID`, `QF_CLIENT_SECRET`, `QF_ENV` | the Quran Foundation's keys — never in a file (`docs/setup/quran-foundation-keys.md`) | —, —, `prelive` |
-| `QF_SYNC_ENABLED`, `QF_SYNC_CRON`, `QF_REFRESH_AFTER`, `QF_AUTH_URL`, `QF_API_URL` | the tafsir sync; the two addresses only for tests | `true`, `0 30 2 * * *`, `6d`, their environment's |
+| `QF_SYNC_ENABLED`, `QF_SYNC_CRON`, `QF_REFRESH_AFTER`, `QF_AUTH_URL`, `QF_API_URL` | the tafsir and mushaf syncs; the two addresses only for tests | `true`, `0 30 2 * * *`, `6d`, their environment's |
+| `QF_SYNC_ON_START` | run the due Quran Foundation syncs when the application starts (a new database; one instance only) | `false` |
 | `QF_LIVE_TAFSIRS` | `liveTest` only: tafsir ids to sync instead of the chosen list (pre-live offers none of ours — use `169`) | — |
 | (later) `DORAR_API_KEY` | Dorar — never in a file | — |
 

@@ -76,3 +76,14 @@ its own recitation (38), never a fallback (1.3.2, below). The script and its res
 3. Its SHA-256 is written here, in the import migration (as a constant it checks) and, through the import, in
    `content_source`.
 4. The import checks its counts before writing a row; a test compares what was stored with the file.
+
+## The Quran Foundation — QCF V1 glyphs (mushaf 2), since 1.8.0
+
+| | |
+| --- | --- |
+| What | The words of «QCF V1 — King Fahd Complex Mushaf 1405 hijri print» as glyphs of the 604 QCF V1 page fonts, with page, line and order — the letter shapes of the printed copy |
+| How | Content Sync, resource `mushafs:2` (scope `content.sync.read`); a snapshot, then changes from the stored token; at least every 7 days (`QfMushafSync`, daily check) |
+| Terms | The Quran Foundation's Developer Terms and their font guide (read 2026-11-27): an offline copy only through Content Sync; never in a repository; the fonts bundled with the app while the account is active, credited «Quran fonts provided by Quran Foundation», never offered on their own |
+| First snapshot | 2026-11-27, production: 1 mushaf record, 604 page records, 83,665 word records (77,429 words, 6,236 numbers) |
+| Checks | Every page 1 – 604; one number for every ayah; every line of theirs a text line of ours (`mushaf_line`) with the same ayahs, an ayah's number at the start of the next line allowed (566 lines) — all passed on the first snapshot |
+| The fonts | Not stored here: the web fetches them at deploy (`tajweed-frontend/tools/fetch-qf-fonts.mjs`, 606 files, 48.1 MB) from `verses.quran.foundation` |

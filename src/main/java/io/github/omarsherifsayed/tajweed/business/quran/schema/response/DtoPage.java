@@ -16,8 +16,10 @@ import java.util.List;
  *                      where the quarter starts at an ayah 1 (the quarter at 15:49 as printed)
  * @param textSource    where the text comes from
  * @param layoutSource  where the line breaks come from
+ * @param qcf           the page in the King Fahd QCF V1 glyphs (the Quran Foundation's mushaf 2), or {@code null}
+ *                      while that mushaf is not synced — the client then draws the Tanzil text in its own font
  */
 @Schema(description = "A page of the Madinah mushaf: its ayahs, its lines as printed (1405H), and their sources.")
 public record DtoPage(int page, List<DtoAyah> ayahs, List<DtoMushafLine> lines, List<Integer> rubAyahIds,
-        DtoContentSource textSource, DtoContentSource layoutSource) {
+        DtoContentSource textSource, DtoContentSource layoutSource, DtoQcfPage qcf) {
 }
